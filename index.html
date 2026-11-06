@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Java-тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one column "IDE" — editor pane with the code, answer buttons, then a console pane that reveals the real output. */
+:root {
+  --bg: #F6F3EE;
+  --surface: #FFFDFA;
+  --line: #E4DCCF;
+  --fg: #23302F;
+  --muted: #6C7470;
+  --brand: #2F6F73;
+  --brand-ink: #FFFDF8;
+  --warm: #D9823F;
+  --ok: #2E8B57;
+  --ok-bg: #E6F3EA;
+  --bad: #C2453A;
+  --bad-bg: #FBE9E6;
+  --editor: #252A33;
+  --editor-fg: #C9D1D9;
+  --editor-gutter: #5E6673;
+  --editor-tab: #1D2129;
+  --tok-kw: #E5A35C;
+  --tok-str: #9CCB8A;
+  --tok-num: #D7A6E8;
+  --tok-com: #6F7886;
+  --tok-type: #7CC4C8;
+  --console: #EEF4F0;
+  --console-fg: #24533C;
+  --font-display: 'Unbounded', 'Manrope', system-ui, sans-serif;
+  --font-body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'DejaVu Sans Mono', monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161A1C; --surface: #1F2427; --line: #30383B; --fg: #E6EAE7; --muted: #9AA39F;
+    --brand: #5FB3B0; --brand-ink: #10201F; --warm: #E79A5C;
+    --ok: #5CC28A; --ok-bg: #18301F; --bad: #EE7A6E; --bad-bg: #3A1F1C;
+    --editor: #111417; --editor-fg: #CBD3DB; --editor-gutter: #4E5662; --editor-tab: #0B0E10;
+    --console: #142219; --console-fg: #8FD5A9;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161A1C; --surface: #1F2427; --line: #30383B; --fg: #E6EAE7; --muted: #9AA39F;
+  --brand: #5FB3B0; --brand-ink: #10201F; --warm: #E79A5C;
+  --ok: #5CC28A; --ok-bg: #18301F; --bad: #EE7A6E; --bad-bg: #3A1F1C;
+  --editor: #111417; --editor-fg: #CBD3DB; --editor-gutter: #4E5662; --editor-tab: #0B0E10;
+  --console: #142219; --console-fg: #8FD5A9;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 760px; margin: 0 auto; padding-block: 28px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 20px; }
+
+header { display: flex; flex-direction: column; gap: 10px; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--brand); }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 6vw, 42px); line-height: 1.05; margin: 0; text-wrap: balance; }
+h1 .semi { color: var(--warm); }
+.lead { margin: 0; color: var(--muted); max-width: 60ch; }
+
+.topics { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 600 14px var(--font-body); border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 7px 14px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+.chip .n { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.chip[aria-pressed="true"] .n { color: var(--brand-ink); opacity: .8; }
+.chip:focus-visible, button:focus-visible { outline: 3px solid var(--warm); outline-offset: 2px; }
+
+.status { display: flex; align-items: center; gap: 14px; font-variant-numeric: tabular-nums; font-size: 14px; color: var(--muted); }
+.bar { flex: 1; height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; display: flex; }
+.bar span { height: 100%; }
+.bar .g { background: var(--ok); } .bar .r { background: var(--bad); }
+.score { font-family: var(--font-mono); font-weight: 600; color: var(--fg); }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.qhead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.tag { font: 700 11px var(--font-body); letter-spacing: .07em; text-transform: uppercase; padding: 4px 9px; border-radius: 6px; background: var(--bg); color: var(--brand); border: 1px solid var(--line); }
+.kind { font-size: 13px; color: var(--muted); }
+.qnum { margin-left: auto; font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.qtext { font-weight: 700; font-size: 18px; margin: 0; text-wrap: balance; }
+
+.editor { background: var(--editor); border-radius: 12px; overflow: hidden; min-width: 0; }
+.editor .tabbar { background: var(--editor-tab); display: flex; align-items: center; gap: 8px; padding: 0 12px; height: 34px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #3A404B; }
+.fname { margin-left: 8px; font: 600 12px var(--font-mono); color: var(--editor-fg); background: var(--editor); padding: 6px 12px; border-radius: 7px 7px 0 0; align-self: flex-end; }
+.code { margin: 0; padding: 14px 16px 16px 0; overflow-x: auto; font: 14px/1.6 var(--font-mono); color: var(--editor-fg); counter-reset: ln; }
+.code .ln { display: block; white-space: pre; padding-left: 52px; position: relative; }
+.code .ln::before { counter-increment: ln; content: counter(ln); position: absolute; left: 0; width: 36px; text-align: right; color: var(--editor-gutter); }
+.k { color: var(--tok-kw); } .s { color: var(--tok-str); } .num { color: var(--tok-num); } .c { color: var(--tok-com); font-style: italic; } .t { color: var(--tok-type); }
+
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 520px) { .opts { grid-template-columns: 1fr; } }
+.opt { text-align: left; font: 500 15px var(--font-mono); background: var(--bg); color: var(--fg); border: 1.5px solid var(--line); border-radius: 10px; padding: 12px 14px; cursor: pointer; display: flex; gap: 10px; align-items: flex-start; min-width: 0; white-space: pre-wrap; word-break: break-word; }
+.opt .letter { font: 700 12px var(--font-body); color: var(--muted); border: 1px solid var(--line); border-radius: 5px; width: 22px; height: 22px; flex: 0 0 auto; display: grid; place-items: center; margin-top: 1px; }
+.opt:hover:not(:disabled) { border-color: var(--brand); }
+.opt:disabled { cursor: default; }
+.opt.right { background: var(--ok-bg); border-color: var(--ok); }
+.opt.right .letter { background: var(--ok); color: var(--surface); border-color: var(--ok); }
+.opt.wrong { background: var(--bad-bg); border-color: var(--bad); }
+.opt.wrong .letter { background: var(--bad); color: var(--surface); border-color: var(--bad); }
+.opt.dim { opacity: .55; }
+
+.reveal { display: flex; flex-direction: column; gap: 12px; }
+.console { background: var(--console); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.console .head { font: 700 11px var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 8px 14px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; }
+.console pre { margin: 0; padding: 12px 14px; font: 14px/1.55 var(--font-mono); color: var(--console-fg); white-space: pre-wrap; overflow-x: auto; }
+.console pre.err { color: var(--bad); }
+.verdict { font-weight: 700; }
+.verdict.ok { color: var(--ok); } .verdict.no { color: var(--bad); }
+.explain { margin: 0; }
+.explain code, .lead code { font-family: var(--font-mono); font-size: .9em; background: var(--bg); border: 1px solid var(--line); padding: 1px 5px; border-radius: 5px; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { font: 700 15px var(--font-body); border-radius: 10px; padding: 12px 18px; cursor: pointer; border: 1.5px solid var(--brand); background: var(--brand); color: var(--brand-ink); }
+.btn.ghost { background: transparent; color: var(--brand); }
+
+.result h2 { font-family: var(--font-display); font-size: 24px; margin: 0; }
+.big { font: 800 56px/1 var(--font-display); color: var(--brand); font-variant-numeric: tabular-nums; }
+.big small { font-size: 22px; color: var(--muted); }
+.rows { display: flex; flex-direction: column; gap: 10px; }
+.row { display: grid; grid-template-columns: 90px 1fr auto; gap: 12px; align-items: center; font-size: 14px; }
+.row .track { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.row .fill { height: 100%; background: var(--brand); border-radius: 99px; }
+.row .val { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--muted); }
+.hint { margin: 0; padding: 12px 14px; border-radius: 10px; background: var(--bg); border: 1px solid var(--line); }
+.best { font-size: 13px; color: var(--muted); }
+footer { font-size: 13px; color: var(--muted); text-align: center; }
+footer a { color: var(--brand); }
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { animation: up .25s ease-out; }
+  @keyframes up { from { transform: translateY(6px); opacity: .4; } to { transform: none; opacity: 1; } }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">IT &amp; Старт в разработке</div>
+    <h1>Java-тренажёр<span class="semi">;</span></h1>
+    <p class="lead">21 задача по циклам, массивам и ООП на примерах из канала. Смотри на код и выбирай, что он выведет. После ответа увидишь настоящий вывод программы и объяснение.</p>
+  </header>
+
+  <div class="topics" id="topics" role="group" aria-label="Тема"></div>
+
+  <div class="status">
+    <div class="bar" aria-hidden="true"><span class="g" id="barG"></span><span class="r" id="barR"></span></div>
+    <span class="score" id="score">0 / 0</span>
+  </div>
+
+  <main id="stage"></main>
+
+  <footer>Разборы по каждой теме лежат в канале <a href="https://t.me/kkkaziz" target="_blank" rel="noopener">t.me/kkkaziz</a></footer>
+</div>
+
+<script>
+const Q = [
+  // ---------- ЦИКЛЫ ----------
+  { t: "Циклы", kind: "Что выведет?", q: "Простой for с нуля", code:
+`for (int i = 0; i < 3; i++) {
+    System.out.print(i + " ");
+}`, opts: ["0 1 2", "1 2 3", "0 1 2 3", "1 2"], a: 0, out: "0 1 2",
+    ex: "Счётчик стартует с 0, а условие <code>i &lt; 3</code> пропускает 0, 1 и 2. Когда <code>i</code> становится 3, условие ложно и цикл заканчивается. Шаблон <code>i = 0; i &lt; N</code> всегда даёт ровно N проходов." },
+  { t: "Циклы", kind: "Что выведет?", q: "while с шагом 2", code:
+`int i = 5;
+while (i > 0) {
+    System.out.print(i + " ");
+    i -= 2;
+}`, opts: ["5 4 3 2 1", "5 3 1", "5 3 1 -1", "5 3"], a: 1, out: "5 3 1",
+    ex: "<code>i -= 2</code> это <code>i = i - 2</code>. Значения идут 5, 3, 1, потом <code>i</code> становится -1, и условие <code>i &gt; 0</code> уже ложно. -1 не печатается, потому что проверка стоит до тела." },
+  { t: "Циклы", kind: "Что выведет?", q: "do-while с ложным условием", code:
+`int x = 10;
+do {
+    System.out.print("A");
+} while (x < 5);`, opts: ["Ничего", "A", "AAAAA", "Ошибка компиляции"], a: 1, out: "A",
+    ex: "<code>do-while</code> сначала выполняет тело, а потом проверяет условие. Поэтому «A» печатается один раз, даже хотя <code>10 &lt; 5</code> ложно. Обычный <code>while</code> не напечатал бы ничего." },
+  { t: "Циклы", kind: "Что выведет?", q: "continue пропускает проход", code:
+`for (int i = 1; i <= 5; i++) {
+    if (i == 3) {
+        continue;
+    }
+    System.out.print(i + " ");
+}`, opts: ["1 2", "1 2 3 4 5", "1 2 4 5", "3"], a: 2, out: "1 2 4 5",
+    ex: "Когда <code>i == 3</code>, срабатывает <code>continue</code>: печать пропускается, но цикл идёт дальше с <code>i = 4</code>. Если бы там был <code>break</code>, вывод был бы «1 2»." },
+  { t: "Циклы", kind: "Что выведет?", q: "break по условию", code:
+`for (int i = 1; i <= 10; i++) {
+    if (i * i > 20) {
+        break;
+    }
+    System.out.print(i + " ");
+}`, opts: ["1 2 3 4", "1 2 3 4 5", "5", "1 2 3 4 5 6 7 8 9 10"], a: 0, out: "1 2 3 4",
+    ex: "4 × 4 = 16, это не больше 20, поэтому 4 печатается. На <code>i = 5</code> получаем 25 &gt; 20, и <code>break</code> выходит из цикла до печати." },
+  { t: "Циклы", kind: "Найди подвох", q: "Сколько раз прибавится count?", code:
+`int count = 0;
+for (int i = 0; i < 5; i++); {
+    count++;
+}
+System.out.println(count);`, opts: ["5", "0", "1", "Ошибка компиляции"], a: 2, out: "1",
+    ex: "Точка с запятой после <code>for (...)</code> делает тело цикла пустым. Цикл 5 раз ничего не делает, а блок <code>{ count++; }</code> выполняется уже после него, один раз. Это ошибка №3 из разбора про циклы." },
+  { t: "Циклы", kind: "Что выведет?", q: "Вложенный цикл", code:
+`int count = 0;
+for (int i = 1; i <= 3; i++) {
+    for (int j = 1; j <= i; j++) {
+        count++;
+    }
+}
+System.out.println(count);`, opts: ["3", "6", "9", "4"], a: 1, out: "6",
+    ex: "Внутренний цикл идёт до <code>j &lt;= i</code>. При <code>i = 1</code> один проход, при <code>i = 2</code> два, при <code>i = 3</code> три. Всего 1 + 2 + 3 = 6. Так же рисуется треугольник из звёздочек." },
+  { t: "Циклы", kind: "Что выведет?", q: "Копилка-накопитель", code:
+`int sum = 0;
+for (int i = 1; i <= 4; i++) {
+    sum += i;
+}
+System.out.println(sum);`, opts: ["4", "10", "15", "24"], a: 1, out: "10",
+    ex: "<code>sum</code> накапливает числа: 1 + 2 + 3 + 4 = 10. 24 получилось бы, если бы мы умножали (<code>*=</code>) и начали с 1." },
+
+  // ---------- МАССИВЫ ----------
+  { t: "Массивы", kind: "Что выведет?", q: "length и индекс", code:
+`int[] a = {3, 7, 1, 9};
+System.out.println(a.length + a[1]);`, opts: ["7", "11", "47", "10"], a: 1, out: "11",
+    ex: "<code>a.length</code> равно 4. <code>a[1]</code> это второй элемент, потому что счёт идёт с нуля, то есть 7. Оба числа типа <code>int</code>, поэтому они складываются: 4 + 7 = 11." },
+  { t: "Массивы", kind: "Что выведет?", q: "Последний элемент", code:
+`int[] a = {10, 20, 30};
+System.out.println(a[a.length - 1]);`, opts: ["20", "30", "3", "Ошибка"], a: 1, out: "30",
+    ex: "Длина 3, значит индексы 0, 1, 2. <code>a.length - 1</code> равно 2, а это последний элемент, 30. Запомни этот приём: так всегда достают последний элемент." },
+  { t: "Массивы", kind: "Найди подвох", q: "Что случится при запуске?", code:
+`int[] arr = {10, 20, 30};
+for (int i = 0; i <= arr.length; i++) {
+    System.out.println(arr[i]);
+}`, opts: ["10 20 30", "10 20", "Напечатает 10 20 30, потом упадёт с ошибкой", "Ошибка компиляции"], a: 2,
+    out: "10\n20\n30\nException in thread \"main\" java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3", err: true,
+    ex: "Из-за <code>&lt;=</code> цикл доходит до <code>i = 3</code>, а элемента <code>arr[3]</code> нет. Компилятор это не ловит, программа падает уже во время работы, успев напечатать первые три числа. Правильно: <code>i &lt; arr.length</code>." },
+  { t: "Массивы", kind: "Что выведет?", q: "Пустой массив", code:
+`int[] arr = new int[3];
+System.out.println(arr[1]);`, opts: ["0", "null", "Ошибка", "3"], a: 0, out: "0",
+    ex: "<code>new int[3]</code> создаёт массив из трёх ячеек и заполняет их значением по умолчанию. Для <code>int</code> это 0, для <code>boolean</code> это <code>false</code>, для <code>String</code> это <code>null</code>." },
+  { t: "Массивы", kind: "Найди подвох", q: "Поменяется ли массив?", code:
+`int[] a = {1, 2, 3};
+for (int x : a) {
+    x = 0;
+}
+System.out.println(a[0]);`, opts: ["0", "1", "3", "Ошибка компиляции"], a: 1, out: "1",
+    ex: "В for-each переменная <code>x</code> это копия элемента. Меняем копию, а массив остаётся прежним. Чтобы обнулить элементы, нужен обычный <code>for</code> и <code>a[i] = 0</code>." },
+  { t: "Массивы", kind: "Что выведет?", q: "Обратный проход", code:
+`int[] a = {1, 2, 3};
+for (int i = a.length - 1; i >= 0; i--) {
+    System.out.print(a[i] + " ");
+}`, opts: ["1 2 3", "3 2 1", "3 2", "2 1 0"], a: 1, out: "3 2 1",
+    ex: "Начинаем с последнего индекса (2) и идём вниз, пока <code>i &gt;= 0</code>. Именно поэтому обратный проход делают обычным <code>for</code>: for-each так не умеет." },
+  { t: "Массивы", kind: "Что выведет?", q: "Подсчёт по условию", code:
+`int[] scores = {85, 92, 70, 100, 64};
+int count = 0;
+for (int s : scores) {
+    if (s > 80) {
+        count++;
+    }
+}
+System.out.println(count);`, opts: ["2", "3", "4", "5"], a: 1, out: "3",
+    ex: "Больше 80 только 85, 92 и 100. Счётчик <code>count</code> вырос три раза. Это тот же массив оценок, что в разборе про циклы." },
+
+  // ---------- ООП ----------
+  { t: "ООП", kind: "Что выведет?", q: "Объекты независимы", code:
+`Hero h1 = new Hero();
+Hero h2 = new Hero();
+h1.hp = 100;
+h2.hp = 80;
+h1.hp = 50;
+System.out.println(h2.hp);`, opts: ["50", "80", "100", "130"], a: 1, out: "80",
+    ex: "<code>h1</code> и <code>h2</code> это два разных героя, созданных двумя <code>new</code>. Урон Артура никак не трогает Лину. Класс один, а объектов сколько угодно." },
+  { t: "ООП", kind: "Найди подвох", q: "Без второго new", code:
+`Hero h1 = new Hero();
+h1.hp = 100;
+Hero h2 = h1;
+h2.hp = 10;
+System.out.println(h1.hp);`, opts: ["100", "10", "110", "Ошибка компиляции"], a: 1, out: "10",
+    ex: "<code>new</code> здесь только один, значит герой тоже один. <code>Hero h2 = h1</code> не копирует героя, а даёт ему второе имя. Поэтому изменения через <code>h2</code> видны и через <code>h1</code>." },
+  { t: "ООП", kind: "Что выведет?", q: "Методы и return", code:
+`Hero lina = new Hero();
+lina.name = "Лина";
+lina.hp = 80;
+lina.takeDamage(30);
+lina.takeDamage(50);
+System.out.println(lina.isAlive());
+
+// в классе Hero:
+// void takeDamage(int damage) { hp = hp - damage; }
+// boolean isAlive() { return hp > 0; }`, opts: ["true", "false", "0", "Лина"], a: 1, out: "false",
+    ex: "80 − 30 = 50, потом 50 − 50 = 0. <code>isAlive()</code> возвращает <code>hp &gt; 0</code>, а <code>0 &gt; 0</code> ложно. Метод с типом <code>boolean</code> отвечает <code>true</code> или <code>false</code>." },
+  { t: "ООП", kind: "Что выведет?", q: "Домашка BankCard", code:
+`BankCard card = new BankCard();
+card.deposit(500);
+card.withdraw(200);
+card.withdraw(1000);
+System.out.println(card.getBalance());
+
+// в классе BankCard:
+// void withdraw(int amount) {
+//     if (amount <= balance) balance -= amount;
+// }`, opts: ["300", "-700", "500", "0"], a: 0, out: "300",
+    ex: "После пополнения 500, после снятия 200 остаётся 300. Снять 1000 нельзя, потому что проверка <code>amount &lt;= balance</code> не пропускает, и баланс не меняется. Без этой проверки ушли бы в минус −700." },
+  { t: "ООП", kind: "Найди подвох", q: "Что скажет компилятор?", code:
+`Hero h;
+h.hp = 5;
+System.out.println(h.hp);`, opts: ["5", "0", "Ошибка компиляции", "Ошибка во время работы"], a: 2,
+    out: "Main.java:2: error: variable h might not have been initialized\n        h.hp = 5;\n        ^", err: true,
+    ex: "Переменная <code>h</code> есть, а героя в ней нет: мы забыли <code>new Hero()</code>. Для локальной переменной Java ловит это ещё при компиляции. Это ошибка №1 из разбора ООП." },
+  { t: "ООП", kind: "Найди подвох", q: "Кто должен поздороваться?", code:
+`Hero artur = new Hero();
+artur.name = "Артур";
+artur.hp = 100;
+Hero.sayHello();`, opts: ["Я Артур, у меня 100 HP", "Я null, у меня 0 HP", "Ошибка компиляции", "Ничего не выведет"], a: 2,
+    out: "Main.java:4: error: non-static method sayHello() cannot be referenced from a static context\n        Hero.sayHello();\n            ^", err: true,
+    ex: "Метод вызвали у класса <code>Hero</code>, то есть у «описания героя», а не у конкретного героя. Java не знает, чьё имя печатать. Правильно: <code>artur.sayHello();</code>" },
+];
+
+const TOPICS = ["Все", "Циклы", "Массивы", "ООП"];
+let topic = "Все";
+let order = [];
+let pos = 0;
+let answers = {}; // index in Q -> chosen option
+let lastPick = null;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+function highlight(code) {
+  const KW = /\b(int|double|boolean|void|for|while|do|if|else|break|continue|return|new|public|class|static|true|false|null)\b/;
+  return code.split("\n").map(line => {
+    let out = "", rest = line;
+    const ci = rest.indexOf("//");
+    let comment = "";
+    if (ci >= 0 && !/"[^"]*\/\/[^"]*"/.test(rest)) { comment = rest.slice(ci); rest = rest.slice(0, ci); }
+    const re = /("(?:[^"\\]|\\.)*")|\b(\d+)\b|\b([A-Za-z_]\w*)\b|([^"\w]+)/g;
+    let m;
+    while ((m = re.exec(rest))) {
+      if (m[1]) out += `<span class="s">${esc(m[1])}</span>`;
+      else if (m[2]) out += `<span class="num">${m[2]}</span>`;
+      else if (m[3]) {
+        if (KW.test(m[3]) && m[3].match(KW)[0] === m[3]) out += `<span class="k">${m[3]}</span>`;
+        else if (/^[A-Z]/.test(m[3])) out += `<span class="t">${m[3]}</span>`;
+        else out += m[3];
+      } else out += esc(m[4]);
+    }
+    if (comment) out += `<span class="c">${esc(comment)}</span>`;
+    return `<span class="ln">${out || " "}</span>`;
+  }).join("");
+}
+
+function pool() { return Q.map((_, i) => i).filter(i => topic === "Все" || Q[i].t === topic); }
+
+function renderTopics() {
+  $("topics").innerHTML = TOPICS.map(t => {
+    const n = t === "Все" ? Q.length : Q.filter(q => q.t === t).length;
+    return `<button class="chip" type="button" id="topic-${TOPICS.indexOf(t)}" aria-pressed="${t === topic}" data-t="${t}">${t}<span class="n">${n}</span></button>`;
+  }).join("");
+  $("topics").querySelectorAll(".chip").forEach(b => b.onclick = () => { topic = b.dataset.t; start(); });
+}
+
+function renderStatus() {
+  const ids = order;
+  const done = ids.filter(i => i in answers);
+  const right = done.filter(i => answers[i] === Q[i].a).length;
+  const wrong = done.length - right;
+  $("barG").style.width = (right / ids.length * 100) + "%";
+  $("barR").style.width = (wrong / ids.length * 100) + "%";
+  $("score").textContent = `${right} / ${ids.length}`;
+}
+
+function renderQuestion() {
+  const i = order[pos], q = Q[i];
+  const picked = answers[i];
+  const done = picked !== undefined;
+  const letters = "ABCD";
+  const opts = q.opts.map((o, k) => {
+    let cls = "opt";
+    if (done) { if (k === q.a) cls += " right"; else if (k === picked) cls += " wrong"; else cls += " dim"; }
+    return `<button class="${cls}" type="button" id="opt-${k}" data-k="${k}" ${done ? "disabled" : ""}><span class="letter">${letters[k]}</span><span>${esc(o)}</span></button>`;
+  }).join("");
+  const isLast = pos === order.length - 1;
+  const reveal = done ? `
+    <div class="reveal">
+      <div class="console"><div class="head"><span>Консоль</span><span>${q.err ? "ошибка" : "Process finished"}</span></div>
+      <pre class="${q.err ? "err" : ""}">${esc(q.out)}</pre></div>
+      <div><span class="verdict ${picked === q.a ? "ok" : "no"}">${picked === q.a ? "Верно." : "Не совсем."}</span> <span class="explain">${q.ex}</span></div>
+      <div class="actions"><button class="btn" type="button" id="next">${isLast ? "Показать результат" : "Дальше"}</button></div>
+    </div>` : "";
+  $("stage").innerHTML = `
+    <section class="card" aria-live="polite">
+      <div class="qhead"><span class="tag">${q.t}</span><span class="kind">${q.kind}</span><span class="qnum">${pos + 1} / ${order.length}</span></div>
+      <p class="qtext">${q.q}</p>
+      <div class="editor"><div class="tabbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="fname">Main.java</span></div>
+        <pre class="code">${highlight(q.code)}</pre></div>
+      <div class="opts">${opts}</div>
+      ${reveal}
+    </section>`;
+  $("stage").querySelectorAll(".opt:not(:disabled)").forEach(b => b.onclick = () => {
+    answers[i] = +b.dataset.k; renderStatus(); renderQuestion();
+    const n = $("next"); if (n) n.focus({ preventScroll: true });
+  });
+  const n = $("next");
+  if (n) n.onclick = () => { if (isLast) renderResult(); else { pos++; renderQuestion(); window.scrollTo({ top: 0, behavior: "smooth" }); } };
+}
+
+function readBest() { try { return JSON.parse(localStorage.getItem("jt-best") || "{}"); } catch (e) { return {}; } }
+function saveBest(b) { try { localStorage.setItem("jt-best", JSON.stringify(b)); } catch (e) {} }
+
+function renderResult() {
+  const right = order.filter(i => answers[i] === Q[i].a).length;
+  const pct = Math.round(right / order.length * 100);
+  const best = readBest();
+  const prev = best[topic];
+  if (prev === undefined || pct > prev) { best[topic] = pct; saveBest(best); }
+  const topics = ["Циклы", "Массивы", "ООП"].filter(t => order.some(i => Q[i].t === t));
+  const rows = topics.map(t => {
+    const ids = order.filter(i => Q[i].t === t);
+    const r = ids.filter(i => answers[i] === Q[i].a).length;
+    return `<div class="row"><span>${t}</span><span class="track"><span class="fill" style="width:${r / ids.length * 100}%; display:block"></span></span><span class="val">${r}/${ids.length}</span></div>`;
+  }).join("");
+  const weakest = topics.map(t => {
+    const ids = order.filter(i => Q[i].t === t);
+    return { t, p: ids.filter(i => answers[i] === Q[i].a).length / ids.length };
+  }).sort((a, b) => a.p - b.p)[0];
+  const msg = pct === 100 ? "Ни одной ошибки. Можно браться за задания со звёздочкой из PDF по циклам."
+    : pct >= 70 ? `Хороший уровень. Слабее всего тема «${weakest.t}»: перечитай разбор в канале и пройди её ещё раз.`
+    : `Стоит повторить тему «${weakest.t}». Открой разбор в канале, потом нажми «Только ошибки».`;
+  const wrongCount = order.filter(i => answers[i] !== Q[i].a).length;
+  $("stage").innerHTML = `
+    <section class="card result" aria-live="polite">
+      <h2>Результат</h2>
+      <div class="big">${right}<small> / ${order.length}</small></div>
+      <div class="rows">${rows}</div>
+      <p class="hint">${msg}</p>
+      ${prev !== undefined ? `<div class="best">Прошлый лучший результат в этой теме: ${prev}%</div>` : ""}
+      <div class="actions">
+        ${wrongCount ? `<button class="btn" type="button" id="retryWrong">Только ошибки (${wrongCount})</button>` : ""}
+        <button class="btn ghost" type="button" id="again">Пройти заново</button>
+      </div>
+    </section>`;
+  const rw = $("retryWrong");
+  if (rw) rw.onclick = () => { order = order.filter(i => answers[i] !== Q[i].a); order.forEach(i => delete answers[i]); pos = 0; renderStatus(); renderQuestion(); };
+  $("again").onclick = start;
+}
+
+function start() {
+  order = pool(); pos = 0; answers = {};
+  renderTopics(); renderStatus(); renderQuestion();
+}
+start();
+</script>
+
+</body>
+</html>
