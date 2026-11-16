@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Интерактивный урок по ООП на Java: 8 шагов, 21 вопрос и битва с драконом. Работает с телефона.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ООП-квест на Java">
+<meta property="og:description" content="Интерактивный урок по ООП на Java: 8 шагов, 21 вопрос и битва с драконом. Работает с телефона.">
+<meta property="og:image" content="https://itstart-kg.github.io/java-traner/quest-java.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://itstart-kg.github.io/java-traner/oop.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#2F6F73">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐉</text></svg>">
+<title>ООП-квест</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a quest map of 8 steps on top; each step = short lesson + live playground (code ↔ arena ↔ console) + one check question that unlocks the next step. */
+:root {
+  --bg: #F6F3EE; --surface: #FFFDFA; --sunk: #EFE9DF; --line: #E2D9CA;
+  --fg: #22302F; --muted: #6A726E;
+  --brand: #2F6F73; --brand-ink: #FFFDF8; --warm: #D9823F; --warm-soft: #F7E6D5;
+  --ok: #2E8B57; --ok-bg: #E4F2E9; --bad: #C2453A; --bad-bg: #FBE8E5;
+  --hp: #3FA36B; --hp-low: #D9823F; --mana: #4E7FD1; --gold: #C99A2E;
+  --editor: #252A33; --editor-fg: #C9D1D9; --editor-gutter: #5E6673; --editor-tab: #1D2129;
+  --tok-kw: #E5A35C; --tok-str: #9CCB8A; --tok-num: #D7A6E8; --tok-com: #6F7886; --tok-type: #7CC4C8; --tok-hl: rgba(240,168,103,.16);
+  --console: #1B1F25; --console-fg: #A9D8B8; --console-err: #F08A7E; --console-info: #8FA3B8;
+  --font-display: 'Unbounded', 'Manrope', system-ui, sans-serif;
+  --font-body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'DejaVu Sans Mono', monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14181A; --surface: #1D2225; --sunk: #171B1E; --line: #2E3639; --fg: #E6EAE7; --muted: #9AA39F;
+    --brand: #5FB3B0; --brand-ink: #0F1F1E; --warm: #E79A5C; --warm-soft: #3A2A1C;
+    --ok: #5CC28A; --ok-bg: #17301F; --bad: #EE7A6E; --bad-bg: #3A1F1C;
+    --hp: #5CC28A; --hp-low: #E79A5C; --mana: #7DA4EA; --gold: #E0B64E;
+    --editor: #101316; --editor-tab: #0A0C0E; --console: #0C0F12;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14181A; --surface: #1D2225; --sunk: #171B1E; --line: #2E3639; --fg: #E6EAE7; --muted: #9AA39F;
+  --brand: #5FB3B0; --brand-ink: #0F1F1E; --warm: #E79A5C; --warm-soft: #3A2A1C;
+  --ok: #5CC28A; --ok-bg: #17301F; --bad: #EE7A6E; --bad-bg: #3A1F1C;
+  --hp: #5CC28A; --hp-low: #E79A5C; --mana: #7DA4EA; --gold: #E0B64E;
+  --editor: #101316; --editor-tab: #0A0C0E; --console: #0C0F12;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 26px 60px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 22px; }
+header { display: flex; flex-direction: column; gap: 8px; }
+.eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--brand); }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 5.5vw, 44px); line-height: 1.05; margin: 0; text-wrap: balance; }
+h1 em { font-style: normal; color: var(--warm); }
+.lead { margin: 0; color: var(--muted); max-width: 64ch; }
+
+/* quest map */
+.map { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+.step { flex: 1 0 auto; min-width: 92px; border: 1.5px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 12px; padding: 8px 10px; font: 700 12.5px var(--font-body); text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 2px; }
+.step .no { font: 600 11px var(--font-mono); opacity: .8; }
+.step[disabled] { cursor: not-allowed; opacity: .5; }
+.step.done { border-color: var(--ok); color: var(--fg); }
+.step.done .no::after { content: " ✓"; color: var(--ok); }
+.step.cur { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.step.cur .no::after { content: ""; }
+button:focus-visible, input:focus-visible, .step:focus-visible { outline: 3px solid var(--warm); outline-offset: 2px; }
+
+/* lesson */
+.lesson { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "intro play" "code play" "more play"; gap: 16px 20px; align-items: start; }
+.lesson > .a-intro { grid-area: intro; } .lesson > .a-play { grid-area: play; } .lesson > .a-code { grid-area: code; } .lesson > .a-more { grid-area: more; }
+@media (min-width: 821px) { .lesson > .a-play { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); } }
+@media (max-width: 820px) { .lesson { grid-template-columns: minmax(0, 1fr); grid-template-areas: "intro" "play" "code" "more"; } }
+.more { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+.more > summary { cursor: pointer; font-weight: 800; color: var(--brand); list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.more > summary::-webkit-details-marker { display: none; }
+.more > summary::after { content: "+"; font: 700 20px var(--font-mono); color: var(--brand); }
+.more[open] > summary::after { content: "−"; }
+.more > .inner { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.more .parse { border: 0; padding: 0; background: none; }
+/* cast strip in header */
+.cast { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cast .tile { width: 46px; height: 46px; border-radius: 13px; background: var(--surface); border: 1.5px solid var(--line); display: grid; place-items: center; font-size: 24px; }
+.cast .vs { font: 800 13px var(--font-display); color: var(--muted); padding: 0 4px; }
+.cast .tile.boss { width: 54px; height: 54px; font-size: 30px; border-color: var(--bad); background: var(--bad-bg); }
+@media (max-width: 520px) {
+  .wrap { gap: 16px; padding-block: 18px 48px; }
+  h1 { font-size: 27px; }
+  .lead { font-size: 15px; }
+  .lang .note { display: none; }
+  h2 { font-size: 21px; }
+  .text p { font-size: 15.5px; }
+  .gloss summary { font-size: 14.5px; }
+  .step { min-width: 84px; padding: 7px 9px; }
+  .opt { padding: 12px; }
+}
+.col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.ch-no { font: 600 13px var(--font-mono); color: var(--warm); }
+h2 { font-family: var(--font-display); font-weight: 600; font-size: 24px; line-height: 1.2; margin: 0; text-wrap: balance; }
+.text p { margin: 0 0 10px; }
+.text p:last-child { margin-bottom: 0; }
+.text code, .q code, .note code { font-family: var(--font-mono); font-size: .88em; background: var(--sunk); border: 1px solid var(--line); padding: 1px 5px; border-radius: 5px; }
+.life { background: var(--warm-soft); border-radius: 12px; padding: 12px 14px; font-size: 15px; }
+.life b { color: var(--warm); }
+
+.editor { background: var(--editor); border-radius: 12px; overflow: hidden; }
+.tabbar { background: var(--editor-tab); display: flex; align-items: center; gap: 7px; padding: 0 12px; height: 32px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: #3A404B; }
+.fname { margin-left: 8px; font: 600 12px var(--font-mono); color: var(--editor-fg); background: var(--editor); padding: 6px 12px; border-radius: 7px 7px 0 0; align-self: flex-end; }
+.code { margin: 0; padding: 12px 14px 14px 0; overflow-x: auto; font: 13.5px/1.6 var(--font-mono); color: var(--editor-fg); counter-reset: ln; }
+.code .ln { display: block; white-space: pre; padding-left: 46px; position: relative; }
+.code .ln::before { counter-increment: ln; content: counter(ln); position: absolute; left: 0; width: 32px; text-align: right; color: var(--editor-gutter); }
+.code .ln.hl { background: var(--tok-hl); }
+.k { color: var(--tok-kw); } .s { color: var(--tok-str); } .n { color: var(--tok-num); } .c { color: var(--tok-com); font-style: italic; } .t { color: var(--tok-type); }
+
+.console { background: var(--console); border-radius: 12px; overflow: hidden; }
+.console .head { font: 700 11px var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: var(--console-info); padding: 7px 14px; border-bottom: 1px solid rgba(255,255,255,.07); display: flex; justify-content: space-between; }
+.console .head button { background: none; border: 0; color: var(--console-info); font: inherit; cursor: pointer; letter-spacing: inherit; }
+.log { margin: 0; padding: 10px 14px; font: 13px/1.6 var(--font-mono); color: var(--console-fg); min-height: 84px; max-height: 210px; overflow-y: auto; white-space: pre-wrap; }
+.log .err { color: var(--console-err); } .log .info { color: var(--console-info); }
+.log .empty { color: var(--console-info); opacity: .7; }
+
+/* controls */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.panel h3 { margin: 0; font-size: 14px; font-weight: 800; letter-spacing: .02em; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+label { font-size: 13px; font-weight: 700; color: var(--muted); display: flex; flex-direction: column; gap: 4px; }
+input[type=text] { font: 600 15px var(--font-body); border: 1.5px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 9px; padding: 8px 10px; width: 150px; }
+input[type=range] { width: 150px; accent-color: var(--brand); }
+.btn { font: 700 14px var(--font-body); border-radius: 10px; padding: 10px 14px; cursor: pointer; border: 1.5px solid var(--brand); background: var(--brand); color: var(--brand-ink); }
+.btn.mono { font-family: var(--font-mono); font-weight: 600; font-size: 13px; }
+.btn.ghost { background: transparent; color: var(--brand); }
+.btn.warn { border-color: var(--warm); background: var(--warm); color: #2A1608; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.toggle { display: inline-flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; }
+.toggle button { font: 600 13px var(--font-mono); border: 0; background: var(--bg); color: var(--muted); padding: 8px 12px; cursor: pointer; }
+.toggle button[aria-pressed="true"] { background: var(--brand); color: var(--brand-ink); }
+
+/* arena */
+.arena { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.empty-arena { border: 1.5px dashed var(--line); border-radius: 12px; padding: 16px; color: var(--muted); font-size: 14px; text-align: center; }
+.hero { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 7px; position: relative; min-width: 0; }
+.hero .top { display: flex; align-items: center; gap: 8px; }
+.ava { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; font-size: 19px; background: var(--sunk); flex: 0 0 auto; }
+.hero .nm { font-weight: 800; font-size: 14.5px; line-height: 1.2; overflow-wrap: anywhere; }
+.hero .cls { font: 600 11px var(--font-mono); color: var(--muted); }
+.bar { height: 7px; border-radius: 99px; background: var(--sunk); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--hp); border-radius: 99px; transition: width .3s; }
+.bar.low span { background: var(--hp-low); }
+.bar.mana span { background: var(--mana); }
+.stat { display: flex; justify-content: space-between; font: 600 11.5px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.stat.broken { color: var(--bad); }
+.hero.dead { opacity: .55; }
+.hero.dead .ava { filter: grayscale(1); }
+.hero.bug { border-color: var(--bad); background: var(--bad-bg); }
+.hero.acting { border-color: var(--warm); box-shadow: 0 0 0 3px var(--warm-soft); }
+.hero .acts { display: flex; flex-wrap: wrap; gap: 5px; }
+.hero .acts button { font: 600 11px var(--font-mono); border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 7px; padding: 4px 6px; cursor: pointer; }
+.hero .acts button:hover { border-color: var(--brand); }
+.fields { display: flex; flex-direction: column; gap: 3px; font: 12px var(--font-mono); }
+.fields .f { display: flex; justify-content: space-between; gap: 6px; padding: 3px 6px; border-radius: 6px; background: var(--sunk); }
+.fields .f.own { background: var(--warm-soft); }
+.fields .src { color: var(--muted); font-size: 10.5px; }
+@media (prefers-reduced-motion: no-preference) {
+  .hero.hit { animation: shake .35s; }
+  .hero.pop { animation: pop .3s ease-out; }
+  @keyframes shake { 25% { transform: translateX(-4px); } 50% { transform: translateX(4px); } 75% { transform: translateX(-2px); } }
+  @keyframes pop { from { transform: scale(.9); opacity: .3; } to { transform: none; opacity: 1; } }
+}
+
+/* boss */
+.boss { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 1.5px solid var(--bad); border-radius: 14px; padding: 12px 14px; }
+.boss .ava { width: 50px; height: 50px; font-size: 30px; }
+.boss .info { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.boss .bar span { background: var(--bad); }
+
+/* quiz */
+.quiz { background: var(--surface); border: 1.5px solid var(--brand); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.quiz .lbl { font: 800 11px var(--font-body); letter-spacing: .09em; text-transform: uppercase; color: var(--brand); }
+.q { font-weight: 700; margin: 0; }
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 520px) { .opts { grid-template-columns: 1fr; } }
+.opt { text-align: left; font: 600 14px var(--font-body); background: var(--bg); color: var(--fg); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-width: 0; overflow-wrap: anywhere; }
+.opt:hover:not(:disabled) { border-color: var(--brand); }
+.opt.right { background: var(--ok-bg); border-color: var(--ok); }
+.opt.wrong { background: var(--bad-bg); border-color: var(--bad); }
+.opt:disabled { cursor: default; }
+.feedback { margin: 0; font-size: 15px; }
+.feedback b.ok { color: var(--ok); } .feedback b.no { color: var(--bad); }
+.nav { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+
+.final { background: var(--brand); color: var(--brand-ink); border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+.final h2 { color: var(--brand-ink); }
+.final ol { margin: 0; padding-left: 20px; }
+.final li { margin: 3px 0; }
+.final .btn { background: var(--brand-ink); color: var(--brand); border-color: var(--brand-ink); align-self: flex-start; }
+.note { font-size: 13.5px; color: var(--muted); margin: 0; }
+.lang { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.langbadge { font: 800 13px var(--font-body); background: var(--warm-soft); color: var(--warm); border: 1.5px solid var(--warm); border-radius: 99px; padding: 5px 12px; }
+.gloss { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; }
+.gloss summary { cursor: pointer; font-weight: 800; color: var(--brand); }
+.gloss-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin: 12px 0 8px; font-size: 14.5px; }
+.gloss-grid div { background: var(--sunk); border-radius: 10px; padding: 10px 12px; }
+.parse { display: flex; flex-direction: column; gap: 6px; }
+.parse h3, .remember h3 { margin: 0; font-size: 14px; font-weight: 800; }
+.parse .pl { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: 4px 10px; font-size: 14.5px; align-items: baseline; }
+.parse .pl code { font-family: var(--font-mono); font-size: 12.5px; background: var(--sunk); border: 1px solid var(--line); padding: 2px 6px; border-radius: 6px; white-space: nowrap; }
+@media (max-width: 520px) { .parse .pl { grid-template-columns: 1fr; } .parse .pl code { justify-self: start; white-space: normal; } }
+.remember { background: var(--ok-bg); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.remember ul { margin: 0; padding-left: 18px; font-size: 14.5px; }
+.qitem { display: flex; flex-direction: column; gap: 10px; padding-top: 14px; border-top: 1px solid var(--line); }
+.qitem:first-of-type { border-top: 0; padding-top: 0; }
+.qmeta { font: 600 12px var(--font-mono); color: var(--muted); }
+.qprog { font: 600 13px var(--font-mono); color: var(--brand); }
+footer { font-size: 13px; color: var(--muted); text-align: center; }
+footer a { color: var(--brand); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">IT &amp; Старт в разработке</div>
+    <h1>ООП-квест на Java<em>:</em> собери команду героев</h1>
+    <p class="lead">Не читай про ООП, а пройди его: 8 шагов, нажимаешь кнопки и сразу видишь, что меняется в коде. Каждый шаг открывается после 3 вопросов, а в конце команда бьётся с драконом.</p>
+    <div class="cast" aria-hidden="true"><span class="tile">🧑</span><span class="tile">⚔️</span><span class="tile">🔮</span><span class="tile">🏹</span><span class="vs">VS</span><span class="tile boss">🐉</span></div>
+    <div class="lang"><span class="langbadge">☕ Язык: Java</span><span class="note">Весь код здесь на Java. В C#, Kotlin, C++ и Python идеи ООП те же, отличается только запись.</span></div>
+  </header>
+  <details class="gloss" id="gloss">
+    <summary>Не играешь в игры? Вот всё, что нужно знать (30 секунд)</summary>
+    <div class="gloss-grid">
+      <div><b>Герой</b> это просто персонаж, как человек в программе. У него есть имя и характеристики.</div>
+      <div><b>hp</b> (health points) это очки здоровья, число. Если hp стало 0, герой выбыл.</div>
+      <div><b>Урон</b> это сколько здоровья отнимает удар. Получил 30 урона, значит hp уменьшилось на 30.</div>
+      <div><b>Мана</b> это запас энергии для магии. Огненный шар тратит 10 маны, кончилась мана, значит магии нет.</div>
+      <div><b>Маг, воин, лучник</b> это разные виды героев. Воин бьёт мечом, маг колдует, лучник стреляет.</div>
+      <div><b>Дракон</b> это сильный противник в конце. Его нужно победить всей командой.</div>
+    </div>
+    <p class="note">Игра здесь только пример. Вместо героев могли быть банковские карты, товары в магазине или студенты, и ООП работало бы точно так же. Поэтому на каждом шаге есть пример из обычной жизни.</p>
+  </details>
+  <nav class="map" id="map" aria-label="Шаги квеста"></nav>
+  <main id="stage"></main>
+  <footer>Подробный разбор ООП лежит в канале <a href="https://t.me/kkkaziz" target="_blank" rel="noopener">t.me/kkkaziz</a></footer>
+</div>
+
+<script>
+(function () {
+const ICON = { Hero: "🧑", Warrior: "⚔️", Mage: "🔮", Archer: "🏹" };
+const STEPS = ["Класс и объект", "Методы", "Конструктор", "Инкапсуляция", "Наследование", "Полиморфизм", "Абстракция", "Битва с боссом"];
+const KEY = "oopquest-v2";
+
+let S = load() || { ch: 0, unlocked: 0, team: [], nextId: 1, hpPrivate: false, heroAbstract: false, quiz: {} };
+let log = [];
+let lastCode = null;
+let boss = null;
+
+function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+/* ---------- highlighter ---------- */
+const KW = new Set(["int","double","boolean","void","for","while","if","else","return","new","public","private","class","static","true","false","null","this","super","extends","abstract","interface","implements"]);
+function highlight(code, hlLines) {
+  hlLines = hlLines || [];
+  return code.split("\n").map((line, idx) => {
+    let rest = line, comment = "";
+    const ci = rest.indexOf("//");
+    if (ci >= 0) { comment = rest.slice(ci); rest = rest.slice(0, ci); }
+    let out = "", m;
+    const re = /("(?:[^"\\]|\\.)*")|(@\w+)|\b(\d+)\b|\b([A-Za-z_]\w*)\b|([^"\w@]+)/g;
+    while ((m = re.exec(rest))) {
+      if (m[1]) out += `<span class="s">${esc(m[1])}</span>`;
+      else if (m[2]) out += `<span class="t">${m[2]}</span>`;
+      else if (m[3]) out += `<span class="n">${m[3]}</span>`;
+      else if (m[4]) out += KW.has(m[4]) ? `<span class="k">${m[4]}</span>` : (/^[A-Z]/.test(m[4]) ? `<span class="t">${m[4]}</span>` : m[4]);
+      else out += esc(m[5]);
+    }
+    if (comment) out += `<span class="c">${esc(comment)}</span>`;
+    return `<span class="ln${hlLines.includes(idx) ? " hl" : ""}">${out || " "}</span>`;
+  }).join("");
+}
+function editor(code, file, hl) {
+  return `<div class="editor"><div class="tabbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="fname">${file || "Hero.java"}</span></div><pre class="code">${highlight(code, hl)}</pre></div>`;
+}
+
+/* ---------- console ---------- */
+function print(text, type) { log.push({ text, type: type || "out" }); if (log.length > 60) log.shift(); renderLog(); }
+function renderLog() {
+  const el = $("log"); if (!el) return;
+  el.innerHTML = log.length ? log.map(l => `<span class="${l.type}">${esc(l.text)}</span>`).join("\n") : `<span class="empty">Здесь будет вывод программы</span>`;
+  el.scrollTop = el.scrollHeight;
+}
+function consoleBox() {
+  return `<div class="console"><div class="head"><span>Консоль</span><button type="button" id="clearLog">очистить</button></div><pre class="log" id="log" aria-live="polite"></pre></div>`;
+}
+
+/* ---------- heroes ---------- */
+function makeHero(cls, name, hp) {
+  const h = { id: S.nextId++, cls, name, hp, maxHp: hp };
+  if (cls === "Mage") { h.mana = 30; h.maxMana = 30; }
+  if (cls === "Archer") { h.arrows = 3; }
+  S.team.push(h); save(); return h;
+}
+function heroCard(h, acts, extra) {
+  const broken = h.hp < 0 || h.hp > 999;
+  const pct = Math.max(0, Math.min(100, h.hp / h.maxHp * 100));
+  const low = pct < 35 ? " low" : "";
+  let html = `<div class="hero${h.hp <= 0 && !broken ? " dead" : ""}${broken ? " bug" : ""}" id="card-${h.id}">
+    <div class="top"><span class="ava" aria-hidden="true">${ICON[h.cls]}</span><div><div class="nm">${esc(h.name)}</div><div class="cls">${h.cls} h${h.id}</div></div></div>
+    <div class="bar${low}"><span style="width:${pct}%"></span></div>
+    <div class="stat${broken ? " broken" : ""}"><span>hp</span><span>${h.hp}${broken ? " 😱" : ""} / ${h.maxHp}</span></div>`;
+  if (h.mana !== undefined) html += `<div class="bar mana"><span style="width:${h.mana / h.maxMana * 100}%"></span></div><div class="stat"><span>mana</span><span>${h.mana}</span></div>`;
+  if (h.arrows !== undefined) html += `<div class="stat"><span>arrows</span><span>${h.arrows}</span></div>`;
+  if (extra) html += extra(h);
+  if (acts && acts.length) html += `<div class="acts">${acts.map(a => `<button type="button" data-act="${a.id}" data-h="${h.id}">${a.label}</button>`).join("")}</div>`;
+  return html + `</div>`;
+}
+function arena(team, acts, extra, emptyText) {
+  if (!team.length) return `<div class="empty-arena">${emptyText || "Пока нет ни одного героя"}</div>`;
+  return `<div class="arena">${team.map(h => heroCard(h, acts, extra)).join("")}</div>`;
+}
+function flash(id, cls) {
+  const el = $("card-" + id); if (!el) return;
+  el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+}
+function heroById(id) { return S.team.find(h => h.id === +id); }
+
+/* game rules */
+function takeDamage(h, dmg, guarded) {
+  if (guarded) {
+    if (dmg < 0) { print(`takeDamage(${dmg}) отклонён: урон не может быть отрицательным`, "info"); return false; }
+    h.hp = Math.max(0, h.hp - dmg);
+  } else {
+    h.hp = h.hp - dmg;
+  }
+  return true;
+}
+function attack(h) {
+  if (h.hp <= 0) return { text: `${h.name} без сознания и пропускает ход`, dmg: 0 };
+  if (h.cls === "Warrior") return { text: `${h.name} бьёт мечом!`, dmg: 35 };
+  if (h.cls === "Mage") {
+    if (h.mana >= 10) { h.mana -= 10; return { text: `${h.name} бросает огненный шар! Мана: ${h.mana}`, dmg: 50 }; }
+    return { text: `${h.name} без маны, бьёт посохом`, dmg: 10 };
+  }
+  if (h.cls === "Archer") {
+    if (h.arrows > 0) { h.arrows--; return { text: `${h.name} стреляет из лука! Стрел: ${h.arrows}`, dmg: 30 }; }
+    return { text: `${h.name} без стрел, бьёт кулаком`, dmg: 8 };
+  }
+  return { text: `${h.name} бьёт кулаком`, dmg: 10 };
+}
+
+/* ---------- quiz ---------- */
+function quizBox(ch, qs) {
+  const st = S.quiz[ch] || {};
+  const solved = qs.filter((q, i) => st[i] === q.a).length;
+  const items = qs.map((q, qi) => {
+    const pick = st[qi], done = pick !== undefined, right = pick === q.a;
+    const opts = q.opts.map((o, i) => {
+      let cls = "opt";
+      if (done) { if (right && i === q.a) cls += " right"; else if (!right && i === pick) cls += " wrong"; }
+      return `<button type="button" class="${cls}" data-qi="${qi}" data-q="${i}" id="q${ch}-${qi}-${i}" ${right ? "disabled" : ""}>${o}</button>`;
+    }).join("");
+    let fb = "";
+    if (done) fb = right ? `<p class="feedback"><b class="ok">Верно.</b> ${q.ex}</p>` : `<p class="feedback"><b class="no">Не совсем.</b> ${q.hint} Попробуй ещё раз.</p>`;
+    return `<div class="qitem"><div class="qmeta">Вопрос ${qi + 1} из ${qs.length}</div><p class="q">${q.q}</p>${q.code ? editor(q.code, "Main.java") : ""}<div class="opts">${opts}</div>${fb}</div>`;
+  }).join("");
+  return `<div class="quiz"><div class="row" style="justify-content:space-between"><div class="lbl">Проверка, чтобы открыть шаг ${ch + 2}</div><div class="qprog">${solved} / ${qs.length}</div></div>${items}</div>`;
+}
+function bindQuiz(ch, qs) {
+  document.querySelectorAll("[data-qi]").forEach(b => b.onclick = () => {
+    const qi = +b.dataset.qi, i = +b.dataset.q;
+    const st = S.quiz[ch] || (S.quiz[ch] = {});
+    st[qi] = i;
+    if (qs.every((q, k) => st[k] === q.a) && S.unlocked < ch + 1) S.unlocked = ch + 1;
+    save(); render();
+    const el = document.getElementById(`q${ch}-${qi}-${i}`); if (el) el.closest(".qitem").scrollIntoView({ block: "nearest" });
+  });
+}
+function detailBox(ch) {
+  const pr = PR[ch] || [], rm = RM[ch] || [];
+  let h = "";
+  if (pr.length) h += `<div class="panel parse"><h3>Разбор по строкам</h3><div class="pl">${pr.map(p => `<code>${esc(p[0])}</code><span>${p[1]}</span>`).join("")}</div></div>`;
+  if (rm.length) h += `<div class="remember"><h3>Запомни</h3><ul>${rm.map(r => `<li>${r}</li>`).join("")}</ul></div>`;
+  return h;
+}
+
+/* ---------- extra content: breakdowns, reminders, 3 questions per step ---------- */
+const PR = [
+  [["class Hero { ... }", "объявляем класс, то есть чертёж. Имя класса пишут с большой буквы."],
+   ["String name; int hp;", "поля: что объект знает про себя. У каждого героя они будут свои."],
+   ["new Hero()", "строим по чертежу новый объект в памяти компьютера."],
+   ["h1.name = \"Артур\"", "точка значит «у него»: у объекта h1 поле name становится «Артур»."]],
+  [["void sayHello()", "void значит «сделал и ничего не вернул». Метод просто печатает строку."],
+   ["void takeDamage(int damage)", "в скобках параметр: число, которое мы передаём методу при вызове."],
+   ["boolean isAlive()", "метод возвращает ответ «да» или «нет» (true / false) через return."],
+   ["return hp > 0;", "return отдаёт результат обратно туда, где метод вызвали."]],
+  [["Hero(String name, int hp)", "конструктор: имя как у класса, типа нет вообще, даже void."],
+   ["this.name = name;", "слева поле объекта («моё имя»), справа то, что пришло в скобках."],
+   ["new Hero(\"Асель\", 90)", "при создании сразу передаём данные, и конструктор их записывает."]],
+  [["private int hp;", "поле закрыто: снаружи класса его нельзя ни прочитать, ни изменить напрямую."],
+   ["public void takeDamage(...)", "метод открыт: через него и только через него можно менять здоровье."],
+   ["if (damage < 0) return;", "проверка: странные значения метод просто не принимает."],
+   ["Math.max(0, hp - damage)", "берём большее из двух чисел, поэтому здоровье не уходит ниже 0."]],
+  [["class Mage extends Hero", "extends значит «расширяет»: маг это герой плюс что-то своё."],
+   ["private int mana;", "своё поле мага. У обычного героя его нет."],
+   ["super(name, hp);", "вызываем конструктор родителя, чтобы он заполнил общие поля. Эта строка всегда первая."]],
+  [["@Override", "пометка «я переписываю метод родителя». Если ошибёшься в названии, Java сразу скажет."],
+   ["void attack() { ... }", "у каждого класса своя версия одного и того же метода."],
+   ["for (Hero h : team)", "в массиве типа Hero лежат и маги, и воины: каждый из них является героем."],
+   ["h.attack();", "Java сама смотрит, кто на самом деле лежит в h, и вызывает его версию метода."]],
+  [["abstract class Hero", "класс-идея: создать new Hero() нельзя, можно только его наследников."],
+   ["abstract void attack();", "метод без тела. Каждый наследник обязан написать свою версию."],
+   ["interface Healer", "список умений без готового кода. Класс подключает его словом implements."]],
+  [["Hero[] team", "массив героев разных классов: так работает наследование."],
+   ["h.attack(dragon)", "один вызов, а удары разные: так работает полиморфизм."],
+   ["takeDamage(45)", "здоровье меняется только через метод с проверками: так работает инкапсуляция."]],
+];
+const RM = [
+  ["Класс один, это описание. Объектов по нему можно сделать сколько угодно.", "Объект создаётся словом new.", "У каждого объекта свои значения полей."],
+  ["Метод это действие с именем: написал один раз, вызываешь сколько хочешь.", "Метод работает с данными того объекта, у которого его вызвали.", "void ничего не возвращает, а boolean, int, String возвращают ответ через return."],
+  ["Конструктор вызывается сам в момент new.", "Имя как у класса, типа нет.", "this значит «этот объект, я сам»."],
+  ["Поля почти всегда делают private.", "Доступ даём через методы, а в методах ставим проверки.", "Так объект сам защищает свои данные."],
+  ["Общее выносим в родителя, своё пишем в наследнике.", "У класса в Java может быть только один родитель.", "Проверка: «наследник является родителем» должно звучать нормально."],
+  ["Одна команда, а каждый выполняет её по-своему.", "Переменная типа родителя может хранить любого наследника.", "Новый класс можно добавить, не меняя код, который с ним работает."],
+  ["abstract class нельзя создать через new.", "Абстрактный метод обязаны написать наследники.", "Родитель (extends) один, интерфейсов (implements) сколько угодно."],
+  [],
+];
+const QZ = [
+  [ { q: "Ты три раза написал <code>new Hero()</code>. Сколько получилось классов и объектов?", opts: ["3 класса, 3 объекта", "1 класс, 3 объекта", "1 класс, 1 объект", "3 класса, 1 объект"], a: 1,
+      ex: "Класс Hero один, это чертёж. Каждый <code>new</code> строит по нему новый объект.", hint: "Сколько раз ты писал слово class?" },
+    { q: "Что выведет этот код?", code: `Hero a = new Hero();\na.name = "Артур";\nHero b = new Hero();\nb.name = "Лина";\na.name = "Тимур";\nSystem.out.println(b.name);`,
+      opts: ["Артур", "Лина", "Тимур", "Ошибка"], a: 1, ex: "a и b это два разных объекта. Меняли имя у a, а у b так и осталось «Лина».", hint: "Имя меняли у какого объекта?" },
+    { q: "Ситуация из жизни: что здесь похоже на класс, а не на объект?", opts: ["Мой телефон с трещиной на экране", "Модель «iPhone 15» в каталоге магазина", "Телефон моего брата", "Телефон у меня в кармане"], a: 1,
+      ex: "Модель в каталоге это описание: какой экран, какая память. А конкретные телефоны у людей это объекты, сделанные по этому описанию.", hint: "Что из этого описание, а не конкретная вещь?" } ],
+  [ { q: "У Лины 80 hp. Вызвали <code>lina.takeDamage(30)</code> два раза, потом <code>lina.isAlive()</code>. Что вернёт метод?", opts: ["true", "false", "20", "Ошибка"], a: 0,
+      ex: "80 − 30 − 30 = 20. Это больше 0, значит <code>isAlive()</code> вернёт <code>true</code>.", hint: "Посчитай остаток и сравни с нулём." },
+    { q: "Что выведет этот код?", code: `Hero a = new Hero();\na.name = "Артур"; a.hp = 50;\nHero b = new Hero();\nb.name = "Лина"; b.hp = 50;\n\na.takeDamage(20);\nb.sayHello();`,
+      opts: ["Я Артур, у меня 30 HP", "Я Лина, у меня 30 HP", "Я Лина, у меня 50 HP", "Ошибка"], a: 2, ex: "Урон получил Артур, а поздоровалась Лина. Её здоровье никто не трогал, поэтому 50.", hint: "У кого вызвали takeDamage, а у кого sayHello?" },
+    { q: "Какой из этих методов должен вернуть ответ, а не просто что-то сделать?", opts: ["<code>void sayHello()</code>", "<code>boolean isAlive()</code>", "<code>void takeDamage(int damage)</code>", "<code>void levelUp()</code>"], a: 1,
+      ex: "Вопрос «жив ли герой?» требует ответа. Поэтому тип <code>boolean</code> и внутри <code>return</code>.", hint: "Посмотри, у какого метода тип не void." } ],
+  [ { q: "Что значит строка <code>this.name = name;</code> в конструкторе?", opts: ["Сравнить два имени", "Моё поле name = имя, которое мне передали", "Создать новую переменную", "Удалить старое имя"], a: 1,
+      ex: "<code>this</code> значит «я сам». Слева поле объекта, справа то, что пришло в скобках.", hint: "К кому относится слово this?" },
+    { q: "Найди подвох: почему это НЕ конструктор?", code: `class Hero {\n    String name;\n    int hp;\n\n    void Hero(String name, int hp) {\n        this.name = name;\n        this.hp = hp;\n    }\n}`,
+      opts: ["Нельзя использовать this", "Из-за void: у конструктора нет никакого типа", "Конструктор должен называться create", "Всё правильно, это конструктор"], a: 1,
+      ex: "С <code>void</code> Java считает это обычным методом с именем Hero. Конструктор пишется без типа: <code>Hero(String name, int hp)</code>.", hint: "Сравни с конструктором в коде слева." },
+    { q: "Что выведет этот код?", code: `Hero h = new Hero("Асель", 90);\nSystem.out.println(h.name + " " + h.hp);`,
+      opts: ["Асель 90", "null 0", "h.name h.hp", "Ошибка"], a: 0, ex: "Конструктор сразу записал имя и здоровье, поэтому поля уже заполнены.", hint: "Что конструктор делает с переданными значениями?" } ],
+  [ { q: "Зачем делать поле <code>private</code>?", opts: ["Чтобы программа работала быстрее", "Чтобы никто снаружи не испортил данные, а менял их только через методы с проверками", "Чтобы поле нельзя было прочитать даже внутри класса", "Чтобы не писать конструктор"], a: 1,
+      ex: "Объект сам охраняет свои данные: снаружи доступ только через методы, а в методах стоят проверки.", hint: "Вспомни, что было с hp = -500 при public." },
+    { q: "Что выведет этот код? (домашка BankCard)", code: `class BankCard {\n    private int balance = 300;\n\n    public void withdraw(int amount) {\n        if (amount <= balance) {\n            balance = balance - amount;\n        }\n    }\n    public int getBalance() { return balance; }\n}\n\nBankCard card = new BankCard();\ncard.withdraw(1000);\nSystem.out.println(card.getBalance());`,
+      opts: ["-700", "300", "0", "1000"], a: 1, ex: "1000 больше 300, проверка не пропустила снятие, и баланс не изменился. Без инкапсуляции ушли бы в минус.", hint: "Пройдёт ли проверка amount <= balance?" },
+    { q: "Что из жизни больше всего похоже на инкапсуляцию?", opts: ["Кошелёк, открытый на столе в кафе", "Банковская карта: деньги только через PIN и банкомат", "Пароль на стикере у монитора", "Дверь без замка"], a: 1,
+      ex: "Деньги спрятаны, и добраться до них можно только через «метод» с проверкой: PIN и лимит.", hint: "Где данные спрятаны, а доступ идёт через проверку?" } ],
+  [ { q: "Какой класс НЕ должен наследовать <code>Hero</code>?", opts: ["Mage (маг)", "Warrior (воин)", "Sword (меч)", "Archer (лучник)"], a: 2,
+      ex: "Правило «является»: маг является героем, а меч нет. Меч лучше сделать полем: у героя есть меч.", hint: "Скажи вслух «… является героем». Где звучит странно?" },
+    { q: "Что выведет этот код?", code: `class Mage extends Hero {\n    // здесь нет метода takeDamage\n}\n\nMage m = new Mage("Лина", 80, 30);\nm.takeDamage(30);\nSystem.out.println(m.getHp());`,
+      opts: ["80", "50", "Ошибка: у Mage нет takeDamage", "30"], a: 1, ex: "Мы не писали <code>takeDamage</code> в Mage, но он пришёл от родителя Hero. 80 − 30 = 50.", hint: "Что наследник получает от родителя?" },
+    { q: "Что делает строка <code>super(name, hp);</code>?", opts: ["Создаёт второго героя", "Вызывает конструктор родителя, чтобы он заполнил общие поля", "Удаляет родителя", "Делает героя супергероем"], a: 1,
+      ex: "Имя и здоровье хранит родитель Hero, поэтому заполняет их его конструктор. super всегда идёт первой строкой.", hint: "super значит «родитель»." } ],
+  [ { q: "Ты добавил класс <code>Archer</code> со своей атакой. Что нужно поменять в цикле <code>for (Hero h : team) h.attack();</code>?", opts: ["Добавить if для лучника", "Ничего, цикл сам вызовет нужную атаку", "Переписать цикл заново", "Сделать отдельный массив для лучников"], a: 1,
+      ex: "Цикл не знает, кто перед ним, и не должен. Java сама вызывает версию метода того класса, который лежит в переменной.", hint: "Код цикла слева менялся, когда ты добавлял лучника?" },
+    { q: "Сколько раз будет напечатано «бьёт мечом!»?", code: `Hero[] team = {\n    new Warrior("Артур", 120),\n    new Mage("Лина", 80, 30),\n    new Warrior("Бакыт", 110)\n};\n\nfor (Hero h : team) {\n    h.attack();\n}`,
+      opts: ["1", "2", "3", "0"], a: 1, ex: "В команде два воина. Маг атакует по-своему, огненным шаром.", hint: "Сколько в массиве объектов класса Warrior?" },
+    { q: "Где полиморфизм в обычной жизни?", opts: ["Кнопка «Play»: видео, музыка и подкаст запускаются по-разному", "Один ключ от одной двери", "Калькулятор, который умеет только складывать", "Фото в паспорте"], a: 0,
+      ex: "Команда одна, «Play», а что именно произойдёт, зависит от того, что перед тобой.", hint: "Где одна команда даёт разный результат?" } ],
+  [ { q: "Чем интерфейс отличается от абстрактного класса?", opts: ["Ничем, это одно и то же", "Абстрактный класс говорит «кем является», интерфейс «что умеет». Интерфейсов можно подключить много", "Интерфейс можно создать через new", "У абстрактного класса не бывает обычных методов"], a: 1,
+      ex: "Родитель через <code>extends</code> бывает только один, а интерфейсов через <code>implements</code> сколько угодно.", hint: "extends бывает один, а implements?" },
+    { q: "Что случится с этим кодом?", code: `abstract class Shape {\n    abstract double area();\n}\n\nShape s = new Shape();`,
+      opts: ["Создастся пустая фигура", "Ошибка компиляции: абстрактный класс нельзя создать", "Программа упадёт во время работы", "area() вернёт 0"], a: 1,
+      ex: "Shape это идея «фигура». Создавать можно только конкретных наследников: <code>new Circle()</code>, <code>new Rectangle()</code>.", hint: "Вспомни, что было с new Hero() при abstract." },
+    { q: "<code>class Mage extends Hero implements Healer, Flyer</code>. Сколько у мага родителей-классов?", opts: ["0", "1", "2", "3"], a: 1,
+      ex: "Родитель-класс один: Hero. Healer и Flyer это интерфейсы, то есть списки умений, их может быть сколько угодно.", hint: "Что пишется после extends, а что после implements?" } ],
+];
+
+/* ---------- chapters ---------- */
+const CH = [];
+
+/* 1. Class & object */
+CH[0] = {
+  quiz: QZ[0],
+  view() {
+    const plain = S.team.filter(h => h.cls === "Hero" && !h.tag);
+    const code = `class Hero {\n    String name;\n    int hp;\n}\n\n` + (lastCode && lastCode.ch === 0 ? lastCode.text : `// нажми "new Hero()" справа`);
+    return {
+      left: `<div class="ch-no">Шаг 1 из 8</div><h2>Класс это чертёж, объект это герой</h2>
+        <div class="text"><p><b>Класс</b> описывает, из чего состоит вещь: у героя есть имя и здоровье. Это ещё не герой, а только чертёж.</p>
+        <p><b>Объект</b> это конкретный герой, построенный по чертежу. Создаётся словом <code>new</code>. Объектов можно сделать сколько угодно.</p></div>
+        <div class="life"><b>Как в жизни:</b> по одному чертежу строят целую улицу домов. Чертёж один, а дома разные, и в каждом свои жильцы.</div>
+        ${editor(code, "Main.java", lastCode && lastCode.ch === 0 ? [6, 7, 8] : [])}`,
+      right: `<div class="panel"><h3>Создай героя</h3>
+          <div class="row"><label for="nm">name<input type="text" id="nm" value="${["Новичок","Айгуль","Бакыт","Динара"][plain.length % 4]}" maxlength="14"></label>
+          <label for="hpR">hp: <span id="hpV">100</span><input type="range" id="hpR" min="20" max="150" step="10" value="100"></label></div>
+          <div class="row"><button type="button" class="btn mono" id="mk" ${plain.length >= 4 ? "disabled" : ""}>new Hero()</button><span class="note">Класс: 1, объектов: ${plain.length}${plain.length >= 4 ? " (хватит, дальше интереснее)" : ""}</span></div></div>
+        ${arena(plain, [], null, "Нажми new Hero(), и здесь появится первый объект")}
+        ${consoleBox()}`,
+    };
+  },
+  bind() {
+    const r = $("hpR"); r.oninput = () => $("hpV").textContent = r.value;
+    const mk = $("mk"); if (mk) mk.onclick = () => {
+      const name = ($("nm").value || "Герой").trim().slice(0, 14) || "Герой";
+      const h = makeHero("Hero", name, +r.value);
+      lastCode = { ch: 0, text: `Hero h${h.id} = new Hero();\nh${h.id}.name = "${name}";\nh${h.id}.hp = ${h.hp};` };
+      print(`Создан объект h${h.id}: ${name}, hp = ${h.hp}`, "info");
+      render(); flash(h.id, "pop");
+    };
+  },
+};
+
+/* 2. Methods */
+CH[1] = {
+  quiz: QZ[1],
+  view() {
+    ensureStarter();
+    const team = S.team.filter(h => h.cls === "Hero" && !h.tag);
+    const code = `class Hero {\n    String name;\n    int hp;\n\n    void sayHello() {\n        System.out.println("Я " + name + ", у меня " + hp + " HP");\n    }\n\n    void takeDamage(int damage) {\n        hp = hp - damage;\n    }\n\n    boolean isAlive() {\n        return hp > 0;\n    }\n}`;
+    const hl = !lastCode || lastCode.ch !== 1 ? [] : lastCode.m === "say" ? [4, 5, 6] : lastCode.m === "dmg" ? [8, 9, 10] : [12, 13, 14];
+    return {
+      left: `<div class="ch-no">Шаг 2 из 8</div><h2>Методы: что герой умеет делать</h2>
+        <div class="text"><p><b>Метод</b> это действие, у которого есть имя. Написал один раз, а вызываешь сколько угодно: <code>h1.sayHello()</code>.</p>
+        <p>Код метода один на всех, а результат у каждого героя свой: метод работает с данными того объекта, у которого его вызвали.</p>
+        <p><code>void</code> значит «сделал и ничего не вернул». <code>boolean</code> значит «вернул ответ через <code>return</code>».</p></div>
+        ${editor(code, "Hero.java", hl)}`,
+      right: `<div class="panel"><h3>Вызови методы у разных героев</h3><p class="note">Нажимай кнопки на карточках и смотри, какая часть кода подсвечивается слева.</p></div>
+        ${arena(team, [{ id: "say", label: "sayHello()" }, { id: "dmg", label: "takeDamage(30)" }, { id: "alive", label: "isAlive()" }])}
+        ${consoleBox()}`,
+    };
+  },
+  bind() {
+    document.querySelectorAll("[data-act]").forEach(b => b.onclick = () => {
+      const h = heroById(b.dataset.h), a = b.dataset.act;
+      if (a === "say") print(`Я ${h.name}, у меня ${h.hp} HP`);
+      if (a === "dmg") { takeDamage(h, 30, true); print(`h${h.id}.takeDamage(30) → у ${h.name} осталось ${h.hp} HP`); }
+      if (a === "alive") print(`h${h.id}.isAlive() → ${h.hp > 0}`);
+      lastCode = { ch: 1, m: a }; save(); render(); if (a === "dmg") flash(h.id, "hit");
+    });
+  },
+};
+
+/* 3. Constructor */
+CH[2] = {
+  quiz: QZ[2],
+  view() {
+    const code = `class Hero {\n    String name;\n    int hp;\n\n    Hero(String name, int hp) {  // конструктор\n        this.name = name;\n        this.hp = hp;\n    }\n}\n\n// было: 3 строки и можно забыть hp\nHero a = new Hero();\na.name = "Артур";\n\n// стало: 1 строка, забыть нельзя\nHero b = new Hero("Артур", 100);`;
+    const made = S.team.filter(h => h.tag === "ctor");
+    return {
+      left: `<div class="ch-no">Шаг 3 из 8</div><h2>Конструктор: герой готов сразу</h2>
+        <div class="text"><p><b>Конструктор</b> это метод, который сам срабатывает в момент <code>new</code> и сразу заполняет поля.</p>
+        <p>Его имя совпадает с именем класса, и у него нет типа, даже <code>void</code>.</p>
+        <p>Без конструктора легко забыть поле. Попробуй справа: создай героя «старым способом» и забудь про <code>hp</code>.</p></div>
+        <div class="life"><b>Как в жизни:</b> в роддоме ребёнку сразу надевают бирку с именем и весом. Конструктор это такая бирка для объекта.</div>
+        ${editor(code, "Main.java", lastCode && lastCode.ch === 2 ? (lastCode.m === "old" ? [11, 12] : [15]) : [4, 5, 6, 7])}`,
+      right: `<div class="panel"><h3>Два способа создать героя</h3>
+          <div class="row"><button type="button" class="btn ghost mono" id="old">new Hero() и забыть hp</button><button type="button" class="btn mono" id="ctor">new Hero("Асель", 90)</button></div></div>
+        ${arena(made, [], null, "Сравни, что получится в каждом случае")}
+        ${consoleBox()}`,
+    };
+  },
+  bind() {
+    $("old").onclick = () => { const h = makeHero("Hero", "Безымянный", 100); h.hp = 0; h.tag = "ctor"; save(); lastCode = { ch: 2, m: "old" };
+      print(`Hero a = new Hero(); a.name = "Безымянный";`, "info"); print(`hp не задали → по умолчанию 0. Герой родился без сознания 💀`, "err"); render(); flash(h.id, "pop"); };
+    $("ctor").onclick = () => { const h = makeHero("Hero", "Асель", 90); h.tag = "ctor"; save(); lastCode = { ch: 2, m: "new" };
+      print(`Hero b = new Hero("Асель", 90); → готов сразу, hp = 90`); render(); flash(h.id, "pop"); };
+  },
+};
+
+/* 4. Encapsulation */
+CH[3] = {
+  quiz: QZ[3],
+  view() {
+    ensureStarter();
+    const target = S.team.filter(h => h.cls === "Hero" && !h.tag)[0];
+    const p = S.hpPrivate;
+    const code = `class Hero {\n    ${p ? "private" : "public"} int hp;\n\n    public void takeDamage(int damage) {\n        if (damage < 0) return;      // проверка\n        hp = Math.max(0, hp - damage); // не ниже 0\n    }\n}\n\n// где-то в другом месте программы:\nh${target.id}.hp = -500;     // хак\nh${target.id}.takeDamage(-50);  // «лечение» уроном`;
+    return {
+      left: `<div class="ch-no">Шаг 4 из 8</div><h2>Инкапсуляция: прячем данные</h2>
+        <div class="text"><p>Если поле открыто (<code>public</code>), любой код может записать туда что угодно, даже <code>hp = -500</code>. Объект никак себя не защитит.</p>
+        <p><b>Инкапсуляция</b> прячет поле (<code>private</code>) и пускает к нему только через методы, а в методах стоят проверки.</p></div>
+        <div class="life"><b>Как в жизни:</b> банкомат. Ты не берёшь деньги руками изнутри, а нажимаешь кнопки, и банкомат сам проверяет, можно ли.</div>
+        ${editor(code, "Hero.java", [1])}`,
+      right: `<div class="panel"><h3>Переключи доступ и попробуй взломать</h3>
+          <div class="row"><span class="toggle" role="group" aria-label="Доступ к hp"><button type="button" id="pub" aria-pressed="${!p}">public</button><button type="button" id="priv" aria-pressed="${p}">private</button></span></div>
+          <div class="row"><button type="button" class="btn warn mono" id="hack">h${target.id}.hp = -500</button><button type="button" class="btn ghost mono" id="neg">takeDamage(-50)</button><button type="button" class="btn ghost" id="fix">Вылечить</button></div></div>
+        ${arena([target])}
+        ${consoleBox()}`,
+    };
+  },
+  bind() {
+    const target = S.team.filter(h => h.cls === "Hero" && !h.tag)[0];
+    $("pub").onclick = () => { S.hpPrivate = false; save(); render(); };
+    $("priv").onclick = () => { S.hpPrivate = true; save(); render(); };
+    $("hack").onclick = () => {
+      if (S.hpPrivate) print(`Main.java:10: error: hp has private access in Hero`, "err");
+      else { target.hp = -500; print(`h${target.id}.hp = -500 → у ${target.name} теперь −500 HP. Это баг 😱`, "err"); }
+      save(); render(); flash(target.id, "hit");
+    };
+    $("neg").onclick = () => {
+      const before = target.hp; takeDamage(target, -50, true);
+      if (target.hp === before) print(`Метод сам защитил героя: hp остался ${target.hp}`, "info");
+      save(); render();
+    };
+    $("fix").onclick = () => { target.hp = target.maxHp; print(`${target.name} вылечен: ${target.hp} HP`, "info"); save(); render(); };
+  },
+};
+
+/* 5. Inheritance */
+CH[4] = {
+  quiz: QZ[4],
+  view() {
+    const pick = S.pickCls || "Mage";
+    const own = pick === "Mage" ? [["int mana", "своё"], ["castFireball()", "своё"]] : [["int rage", "своё"], ["shieldBlock()", "своё"]];
+    const code = pick === "Mage"
+      ? `class Mage extends Hero {\n    private int mana;\n\n    Mage(String name, int hp, int mana) {\n        super(name, hp);  // конструктор Hero\n        this.mana = mana;\n    }\n\n    void castFireball() { ... }\n}`
+      : `class Warrior extends Hero {\n    private int rage;\n\n    Warrior(String name, int hp) {\n        super(name, hp);  // конструктор Hero\n    }\n\n    void shieldBlock() { ... }\n}`;
+    const kids = S.team.filter(h => h.cls === "Mage" || h.cls === "Warrior");
+    const blueprint = `<div class="fields">
+        <div class="f"><span>String name</span><span class="src">из Hero</span></div>
+        <div class="f"><span>int hp</span><span class="src">из Hero</span></div>
+        <div class="f"><span>takeDamage()</span><span class="src">из Hero</span></div>
+        <div class="f"><span>isAlive()</span><span class="src">из Hero</span></div>
+        ${own.map(o => `<div class="f own"><span>${o[0]}</span><span class="src">${o[1]}</span></div>`).join("")}</div>`;
+    return {
+      left: `<div class="ch-no">Шаг 5 из 8</div><h2>Наследование: общее берём у родителя</h2>
+        <div class="text"><p>Маг и воин тоже герои: у них есть имя, здоровье и урон. Копировать этот код в каждый класс плохо: найдёшь баг и будешь чинить в трёх местах.</p>
+        <p><b>Наследование</b>: общее лежит в родителе <code>Hero</code>, а наследник пишет <code>extends Hero</code>, получает всё это автоматически и добавляет своё.</p>
+        <p><code>super(name, hp)</code> вызывает конструктор родителя, чтобы он заполнил общие поля.</p></div>
+        <div class="life"><b>Как в жизни:</b> ребёнок наследует от родителей фамилию и цвет глаз, но характер у него свой.</div>
+        ${editor(code, pick + ".java", [0, 4])}`,
+      right: `<div class="panel"><h3>Что получает наследник</h3>
+          <div class="row"><span class="toggle" role="group" aria-label="Класс"><button type="button" id="pM" aria-pressed="${pick === "Mage"}">Mage</button><button type="button" id="pW" aria-pressed="${pick === "Warrior"}">Warrior</button></span></div>
+          ${blueprint}
+          <div class="row"><button type="button" class="btn mono" id="mk2" ${kids.some(k => k.cls === pick) ? "disabled" : ""}>${pick === "Mage" ? 'new Mage("Лина", 80, 30)' : 'new Warrior("Артур", 120)'}</button>${kids.some(k => k.cls === pick) ? `<span class="note">Уже в команде</span>` : ""}</div></div>
+        ${arena(kids, [], null, "Создай мага и воина, они пригодятся дальше")}
+        ${consoleBox()}`,
+    };
+  },
+  bind() {
+    $("pM").onclick = () => { S.pickCls = "Mage"; save(); render(); };
+    $("pW").onclick = () => { S.pickCls = "Warrior"; save(); render(); };
+    const b = $("mk2"); if (b) b.onclick = () => {
+      const pick = S.pickCls || "Mage";
+      const h = pick === "Mage" ? makeHero("Mage", "Лина", 80) : makeHero("Warrior", "Артур", 120);
+      print(`${pick} h${h.id} создан. takeDamage() писать не пришлось, он пришёл из Hero`, "info");
+      render(); flash(h.id, "pop");
+    };
+  },
+};
+
+/* 6. Polymorphism */
+CH[5] = {
+  quiz: QZ[5],
+  view() {
+    ensureTeam();
+    const team = battleTeam();
+    const code = `class Warrior extends Hero {\n    @Override\n    void attack() {\n        System.out.println(name + " бьёт мечом!");\n    }\n}\nclass Mage extends Hero {\n    @Override\n    void attack() {\n        System.out.println(name + " бросает огненный шар!");\n    }\n}\n\n// одна команда для всех:\nfor (Hero h : team) {\n    h.attack();\n}`;
+    const hasArcher = S.team.some(h => h.cls === "Archer");
+    return {
+      left: `<div class="ch-no">Шаг 6 из 8</div><h2>Полиморфизм: одна команда, каждый по-своему</h2>
+        <div class="text"><p>Каждый наследник переписывает метод <code>attack()</code> по-своему. Пометка <code>@Override</code> значит «переписываю метод родителя».</p>
+        <p>А дальше главное: в массиве <code>Hero[]</code> лежат и маг, и воин, и цикл вызывает у всех один и тот же <code>h.attack()</code>. Но каждый бьёт по-своему.</p></div>
+        <div class="life"><b>Как в жизни:</b> учитель говорит классу «Нарисуйте животное». Команда одна, а рисунки у всех разные.</div>
+        ${editor(code, "Main.java", [14, 15, 16])}`,
+      right: `<div class="panel"><h3>Запусти цикл</h3>
+          <div class="row"><button type="button" class="btn mono" id="run">▶ for (Hero h : team) h.attack()</button><button type="button" class="btn ghost mono" id="arch" ${hasArcher ? "disabled" : ""}>+ new Archer("Тимур", 90)</button></div>
+          ${hasArcher ? `<p class="note">Лучник в команде. Посмотри на код слева: цикл не изменился ни на символ.</p>` : `<p class="note">Запусти цикл, потом добавь лучника и запусти ещё раз.</p>`}</div>
+        ${arena(team)}
+        ${consoleBox()}`,
+    };
+  },
+  bind() {
+    $("run").onclick = () => runLoop(battleTeam(), null);
+    const a = $("arch"); if (a) a.onclick = () => { const h = makeHero("Archer", "Тимур", 90); print(`Archer h${h.id} в команде`, "info"); render(); flash(h.id, "pop"); };
+  },
+};
+
+/* 7. Abstraction */
+CH[6] = {
+  quiz: QZ[6],
+  view() {
+    const ab = S.heroAbstract;
+    const code = `${ab ? "abstract " : ""}class Hero {\n    // поля и методы как раньше\n    ${ab ? "abstract void attack();  // без тела: каждый наследник обязан написать свою" : 'void attack() { System.out.println(name + " бьёт кулаком"); }'}\n}\n\ninterface Healer {          // список умений\n    void heal(Hero target);\n}\n\nclass Mage extends Hero implements Healer { ... }\n\nHero x = new Hero("Кто-то", 50);  // ${ab ? "ошибка!" : "пока можно"}`;
+    const mage = S.team.find(h => h.cls === "Mage");
+    const wounded = battleTeam().filter(h => h.hp < h.maxHp && h.hp > 0 && h !== mage)[0] || battleTeam().find(h => h !== mage);
+    return {
+      left: `<div class="ch-no">Шаг 7 из 8</div><h2>Абстракция: только главное</h2>
+        <div class="text"><p>Бывает в игре просто «герой»? Нет, всегда конкретный: маг, воин, лучник. Значит, <code>Hero</code> это только общая идея. Такой класс делают <code>abstract</code>: создать <code>new Hero()</code> уже нельзя, только наследников.</p>
+        <p>Абстрактный метод <code>attack()</code> без тела это обещание: «атака будет у всех, а какая, решит наследник».</p>
+        <p><b>Интерфейс</b> это просто список умений. <code>implements Healer</code> значит «маг умеет лечить».</p></div>
+        <div class="life"><b>Как в жизни:</b> ты водишь машину рулём и педалями и не думаешь, как устроен двигатель. Руль и педали это абстракция.</div>
+        ${editor(code, "Hero.java", [0, 2, 10])}`,
+      right: `<div class="panel"><h3>Сделай Hero абстрактным</h3>
+          <div class="row"><span class="toggle" role="group" aria-label="Класс Hero"><button type="button" id="cNorm" aria-pressed="${!ab}">class Hero</button><button type="button" id="cAbs" aria-pressed="${ab}">abstract class Hero</button></span></div>
+          <div class="row"><button type="button" class="btn warn mono" id="newHero">new Hero("Кто-то", 50)</button></div></div>
+        <div class="panel"><h3>Интерфейс Healer</h3>
+          <div class="row"><button type="button" class="btn mono" id="heal" ${mage && wounded ? "" : "disabled"}>${mage && wounded ? `h${mage.id}.heal(h${wounded.id})` : "нужен маг"}</button></div></div>
+        ${arena(battleTeam())}
+        ${consoleBox()}`,
+    };
+  },
+  bind() {
+    $("cNorm").onclick = () => { S.heroAbstract = false; save(); render(); };
+    $("cAbs").onclick = () => { S.heroAbstract = true; save(); render(); };
+    $("newHero").onclick = () => {
+      if (S.heroAbstract) print(`Main.java:11: error: Hero is abstract; cannot be instantiated`, "err");
+      else print(`Создался «просто герой». Работает, но в игре таких не бывает. Включи abstract`, "info");
+    };
+    const h = $("heal"); if (h && !h.disabled) h.onclick = () => {
+      const mage = S.team.find(x => x.cls === "Mage");
+      const t = battleTeam().filter(x => x.hp < x.maxHp && x.hp > 0 && x !== mage)[0] || battleTeam().find(x => x !== mage);
+      t.hp = Math.min(t.maxHp, t.hp + 40);
+      print(`${mage.name} лечит ${t.name}: +40 → ${t.hp} HP (метод из интерфейса Healer)`);
+      save(); render(); flash(t.id, "pop");
+    };
+  },
+};
+
+/* 8. Boss */
+CH[7] = {
+  view() {
+    ensureTeam();
+    if (!boss) resetBattle();
+    const team = battleTeam();
+    const code = `Hero[] team = {\n${team.map(h => `    new ${h.cls}(...)`).join(",\n")}\n};\n\nwhile (dragon.isAlive() && teamAlive(team)) {\n    for (Hero h : team) {      // полиморфизм\n        h.attack(dragon);\n    }\n    Hero target = randomHero(team);\n    target.takeDamage(45); // hp не ниже 0\n}`;
+    const won = boss.hp <= 0, lost = team.every(h => h.hp <= 0);
+    return {
+      left: `<div class="ch-no">Шаг 8 из 8</div><h2>Битва с драконом: всё вместе</h2>
+        <div class="text"><p>Вот здесь работает всё сразу. Команда это массив <code>Hero[]</code>, каждый атакует по-своему (полиморфизм), классы героев построены на одном родителе (наследование), а здоровье защищено методом <code>takeDamage</code> (инкапсуляция).</p>
+        <p>Каждый раунд вся команда бьёт дракона, а он в ответ бьёт одного случайного героя на 45. Мана у мага и стрелы у лучника заканчиваются, так что думай, хватит ли сил.</p></div>
+        ${editor(code, "Battle.java", [team.length + 4, team.length + 5, team.length + 8])}`,
+      right: `<div class="boss"><span class="ava" aria-hidden="true">🐉</span><div class="info"><b>${boss.name}</b>
+          <div class="bar"><span style="width:${Math.max(0, boss.hp / boss.maxHp * 100)}%"></span></div>
+          <div class="stat"><span>hp</span><span>${Math.max(0, boss.hp)} / ${boss.maxHp}</span></div></div></div>
+        <div class="panel"><div class="row">
+          <button type="button" class="btn mono" id="round" ${won || lost ? "disabled" : ""}>▶ Раунд ${boss.round + 1}</button>
+          <button type="button" class="btn ghost" id="reset">Начать бой заново</button></div></div>
+        ${arena(team)}
+        ${consoleBox()}
+        ${won ? finalBox(true) : lost ? finalBox(false) : ""}`,
+    };
+  },
+  bind() {
+    $("round").onclick = () => {
+      if (!$("round") || boss.over) return;
+      boss.round++;
+      print(`— Раунд ${boss.round} —`, "info");
+      const team = battleTeam();
+      for (const h of team) {
+        const r = attack(h);
+        boss.hp -= r.dmg;
+        print(r.text + (r.dmg ? ` (−${r.dmg})` : ""));
+        if (boss.hp <= 0) break;
+      }
+      if (boss.hp > 0) {
+        const alive = team.filter(h => h.hp > 0);
+        if (alive.length) {
+          const t = alive[Math.floor(Math.random() * alive.length)];
+          takeDamage(t, 45, true);
+          print(`Дракон бьёт ${t.name}: −45 → ${t.hp} HP`, "err");
+          save(); render(); flash(t.id, "hit");
+        }
+        if (team.every(h => h.hp <= 0)) print(`Команда пала. Попробуй ещё раз`, "err");
+      } else {
+        print(`Дракон повержен за ${boss.round} раунд(а)! 🏆`, "info");
+        if (S.unlocked < 8) S.unlocked = 8;
+      }
+      save(); render();
+    };
+    $("reset").onclick = () => { resetBattle(); print(`Бой начат заново, все герои вылечены`, "info"); render(); };
+  },
+};
+
+function finalBox(win) {
+  return `<div class="final"><h2>${win ? "Победа! Ты прошёл ООП-квест" : "Почти! Попробуй ещё раз"}</h2>
+    <p>${win ? "Ты только что своими руками использовал все 4 принципа ООП. Вот они в 4 строки, это любимый вопрос на собеседовании junior:" : "Подсказка: важен состав команды. Вернись к наследованию и полиморфизму и посмотри, кто бьёт сильнее. А пока повтори 4 принципа:"}</p>
+    <ol><li><b>Инкапсуляция:</b> прячем данные, доступ через методы.</li><li><b>Наследование:</b> передаём общее от родителя к наследнику.</li><li><b>Полиморфизм:</b> одна команда, у каждого своё поведение.</li><li><b>Абстракция:</b> показываем только главное, детали прячем.</li></ol>
+    <button type="button" class="btn" id="restartAll">Пройти квест заново</button></div>`;
+}
+
+/* helpers for team */
+function ensureStarter() {
+  if (!S.team.some(h => h.cls === "Hero" && !h.tag)) { makeHero("Hero", "Новичок", 100); makeHero("Hero", "Айгуль", 80); }
+}
+function ensureTeam() {
+  if (!S.team.some(h => h.cls === "Warrior")) makeHero("Warrior", "Артур", 120);
+  if (!S.team.some(h => h.cls === "Mage")) makeHero("Mage", "Лина", 80);
+}
+function battleTeam() {
+  const pick = [];
+  ["Warrior", "Mage", "Archer"].forEach(c => { const h = S.team.find(x => x.cls === c); if (h) pick.push(h); });
+  if (!S.heroAbstract) { const plain = S.team.find(x => x.cls === "Hero" && x.tag !== "ctor" && x.hp >= 0); if (plain) pick.push(plain); }
+  return pick;
+}
+function resetBattle() {
+  boss = { name: "Дракон", hp: 320, maxHp: 320, round: 0, over: false };
+  S.team.forEach(h => { h.hp = h.maxHp; if (h.mana !== undefined) h.mana = h.maxMana; if (h.arrows !== undefined) h.arrows = 3; });
+  save();
+}
+function runLoop(team) {
+  print(`for (Hero h : team) h.attack();`, "info");
+  let i = 0;
+  const step = () => {
+    if (i >= team.length) { save(); render(); return; }
+    const h = team[i++];
+    const r = attack(h);
+    print(r.text);
+    document.querySelectorAll(".hero.acting").forEach(e => e.classList.remove("acting"));
+    const el = $("card-" + h.id); if (el) el.classList.add("acting");
+    setTimeout(step, 380);
+  };
+  step();
+}
+
+/* ---------- render ---------- */
+function renderMap() {
+  $("map").innerHTML = STEPS.map((t, i) => {
+    const cls = ["step", i === S.ch ? "cur" : "", i < S.unlocked || (i === 7 && S.unlocked >= 8) ? "done" : ""].join(" ");
+    return `<button type="button" class="${cls}" id="step-${i}" data-step="${i}" ${i > S.unlocked ? "disabled" : ""}><span class="no">${String(i + 1).padStart(2, "0")}</span>${t}</button>`;
+  }).join("");
+  $("map").querySelectorAll("[data-step]").forEach(b => b.onclick = () => go(+b.dataset.step));
+}
+function go(i) {
+  if (i > S.unlocked) return;
+  S.ch = i; lastCode = null; log = []; save(); render();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function render() {
+  renderMap();
+  const c = CH[S.ch];
+  const v = c.view();
+  const next = S.ch < 7 ? `<button type="button" class="btn" id="next" ${S.unlocked > S.ch ? "" : "disabled"}>${S.unlocked > S.ch ? "Дальше: " + STEPS[S.ch + 1] : "Ответь на вопрос, чтобы идти дальше"}</button>` : "";
+  const prev = S.ch > 0 ? `<button type="button" class="btn ghost" id="prev">Назад</button>` : `<span></span>`;
+  const cut = v.left.indexOf('<div class="editor">');
+  const intro = cut >= 0 ? v.left.slice(0, cut) : v.left, codePart = cut >= 0 ? v.left.slice(cut) : "";
+  const more = detailBox(S.ch);
+  const wide = window.matchMedia && window.matchMedia("(min-width: 821px)").matches;
+  $("stage").innerHTML = `<div class="lesson"><div class="col a-intro">${intro}</div><div class="col a-play">${v.right}</div>
+    ${codePart ? `<div class="col a-code">${codePart}</div>` : ""}
+    ${more ? `<details class="more a-more" id="more-${S.ch}" ${wide ? "open" : ""}><summary>Разбор по строкам и «Запомни»</summary><div class="inner">${more}</div></details>` : ""}</div>
+    ${c.quiz ? `<div style="margin-top:20px">${quizBox(S.ch, c.quiz)}</div>` : ""}
+    <div class="nav" style="margin-top:16px">${prev}${next}</div>`;
+  renderLog();
+  const cl = $("clearLog"); if (cl) cl.onclick = () => { log = []; renderLog(); };
+  c.bind();
+  if (c.quiz) bindQuiz(S.ch, c.quiz);
+  const n = $("next"); if (n) n.onclick = () => go(S.ch + 1);
+  const p = $("prev"); if (p) p.onclick = () => go(S.ch - 1);
+  const ra = $("restartAll"); if (ra) ra.onclick = () => {
+    S = { ch: 0, unlocked: 0, team: [], nextId: 1, hpPrivate: false, heroAbstract: false, quiz: {} }; boss = null; log = []; lastCode = null; save(); render();
+  };
+}
+render();
+})();
+</script>
+
+</body>
+</html>
