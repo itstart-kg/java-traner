@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Классы в ООП на Java — полный разбор</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1d212a; --text:#e6e8ee; --muted:#9aa3b2;
+    --accent:#f29b38; --accent2:#5aa9ff; --green:#57c98a; --red:#ff6b6b; --border:#2a2f3a;
+    --code:#12141a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 20px 80px}
+  header{padding:40px 0 24px;border-bottom:1px solid var(--border);margin-bottom:28px}
+  .tag{display:inline-block;font-size:13px;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 12px;margin-bottom:14px}
+  h1{font-size:40px;line-height:1.15;margin:0 0 12px}
+  h1 span{color:var(--accent)}
+  .lead{color:var(--muted);font-size:18px;margin:0}
+  nav.toc{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin:28px 0 40px}
+  nav.toc b{display:block;margin-bottom:8px}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:28px}
+  nav.toc a{color:var(--accent2);text-decoration:none}
+  nav.toc a:hover{text-decoration:underline}
+  section{margin:56px 0}
+  h2{font-size:28px;margin:0 0 14px;display:flex;gap:12px;align-items:baseline}
+  h2 .num{color:var(--accent);font-size:20px;font-weight:700;min-width:34px}
+  h3{font-size:20px;margin:28px 0 8px;color:#fff}
+  p{margin:10px 0}
+  code{font-family:"JetBrains Mono",Consolas,Menlo,monospace;font-size:.9em}
+  :not(pre)>code{background:var(--panel2);border:1px solid var(--border);padding:1px 6px;border-radius:6px;color:#ffd29a}
+  .codebox{position:relative;margin:14px 0}
+  .codebox .lbl{position:absolute;top:0;left:0;font-size:12px;color:var(--muted);background:var(--panel2);border:1px solid var(--border);border-bottom:none;border-radius:10px 0 10px 0;padding:3px 10px}
+  .codebox button{position:absolute;top:8px;right:8px;background:var(--panel2);color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:12px;padding:4px 10px;cursor:pointer}
+  .codebox button:hover{color:#fff}
+  pre{background:var(--code);border:1px solid var(--border);border-radius:12px;padding:34px 18px 16px;overflow-x:auto;margin:0;line-height:1.55}
+  pre code{font-size:14.5px;color:#d7dae0}
+  .k{color:#ff8f5a}.t{color:#6fc3ff}.s{color:#9be28a}.c{color:#6b7385;font-style:italic}.n{color:#d9a6ff}.a{color:#ffd166}
+  .out{background:#0b0d11;border:1px dashed var(--border);border-radius:10px;padding:10px 16px;font-family:Consolas,Menlo,monospace;font-size:14px;color:var(--green);white-space:pre;overflow-x:auto;margin:8px 0 16px}
+  .out::before{content:"Вывод:";display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+  .note,.warn,.tip{border-radius:12px;padding:14px 18px;margin:16px 0;border:1px solid}
+  .note{background:rgba(90,169,255,.08);border-color:rgba(90,169,255,.35)}
+  .warn{background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.35)}
+  .tip{background:rgba(87,201,138,.08);border-color:rgba(87,201,138,.35)}
+  .note b:first-child,.warn b:first-child,.tip b:first-child{display:block;margin-bottom:4px}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px;background:var(--panel);border-radius:12px;overflow:hidden}
+  th,td{border-bottom:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600}
+  td.y{color:var(--green);text-align:center}td.x{color:var(--red);text-align:center}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+  .card h4{margin:0 0 6px;color:var(--accent)}
+  figure{margin:20px 0;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px}
+  figcaption{color:var(--muted);font-size:14px;text-align:center;margin-top:8px}
+  svg{width:100%;height:auto;display:block}
+  details{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:600}
+  details[open] summary{margin-bottom:8px;color:var(--accent)}
+  ul.check{list-style:none;padding:0}
+  ul.check li{padding-left:28px;position:relative;margin:6px 0}
+  ul.check li::before{content:"✓";position:absolute;left:4px;color:var(--green);font-weight:700}
+  ul.bad li::before{content:"✗";color:var(--red)}
+  footer{margin-top:70px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:14px;text-align:center}
+  @media (max-width:640px){h1{font-size:30px}nav.toc ol{columns:1}.grid2{grid-template-columns:1fr}body{font-size:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="tag">IT &amp; Старт в разработке · Java · ООП</div>
+  <h1>Классы в ООП: <span>полный разбор</span> на Java</h1>
+  <p class="lead">От «что такое класс» до конструкторов, инкапсуляции, static, equals/toString и полноценного примера. Весь код можно скопировать и запустить.</p>
+</header>
+
+<nav class="toc">
+  <b>Содержание</b>
+  <ol>
+    <li><a href="#s1">Что такое класс и объект</a></li>
+    <li><a href="#s2">Из чего состоит класс</a></li>
+    <li><a href="#s3">Создание объекта и new</a></li>
+    <li><a href="#s4">Ссылки и память</a></li>
+    <li><a href="#s5">Конструкторы</a></li>
+    <li><a href="#s6">Ключевое слово this</a></li>
+    <li><a href="#s7">Модификаторы доступа</a></li>
+    <li><a href="#s8">Инкапсуляция: геттеры и сеттеры</a></li>
+    <li><a href="#s9">Методы и их перегрузка</a></li>
+    <li><a href="#s10">static: члены класса</a></li>
+    <li><a href="#s11">final</a></li>
+    <li><a href="#s12">toString, equals, hashCode</a></li>
+    <li><a href="#s13">Наследование (кратко)</a></li>
+    <li><a href="#s14">Полный пример: BankAccount</a></li>
+    <li><a href="#s15">Частые ошибки</a></li>
+    <li><a href="#s16">Шпаргалка и задание</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="num">01</span>Что такое класс и объект</h2>
+  <p><b>Класс</b> — это шаблон (чертёж), который описывает, <i>какие данные</i> будут у объектов и <i>что они умеют делать</i>.</p>
+  <p><b>Объект</b> (экземпляр класса) — конкретная «вещь», созданная по этому шаблону. У каждого объекта свои значения данных.</p>
+
+  <div class="grid2">
+    <div class="card"><h4>Класс = чертёж</h4>Чертёж дома: «у дома есть адрес, этажи, цвет». Жить в чертеже нельзя.</div>
+    <div class="card"><h4>Объект = дом</h4>Конкретный дом по чертежу: ул. Ленина 5, 9 этажей, белый. По одному чертежу можно построить сколько угодно домов.</div>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+      <rect x="250" y="10" width="220" height="110" rx="12" fill="#1d212a" stroke="#f29b38" stroke-width="2"/>
+      <text x="360" y="38" text-anchor="middle" fill="#f29b38" font-size="18" font-weight="700">class Student</text>
+      <line x1="262" y1="50" x2="458" y2="50" stroke="#2a2f3a"/>
+      <text x="270" y="74" fill="#e6e8ee" font-size="14">name, age</text>
+      <text x="270" y="100" fill="#e6e8ee" font-size="14">study(), introduce()</text>
+      <g stroke="#5aa9ff" stroke-width="2" fill="none" marker-end="url(#ar)">
+        <path d="M300 122 L120 170"/><path d="M360 122 L360 170"/><path d="M420 122 L600 170"/>
+      </g>
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#5aa9ff"/></marker></defs>
+      <text x="215" y="150" fill="#9aa3b2" font-size="13">new</text>
+      <text x="368" y="152" fill="#9aa3b2" font-size="13">new</text>
+      <text x="490" y="150" fill="#9aa3b2" font-size="13">new</text>
+      <g font-size="14">
+        <rect x="30" y="175" width="180" height="70" rx="10" fill="#171a21" stroke="#5aa9ff"/>
+        <text x="120" y="202" text-anchor="middle" fill="#6fc3ff" font-weight="700">aziz</text>
+        <text x="120" y="228" text-anchor="middle" fill="#e6e8ee">"Азиз", 19</text>
+        <rect x="270" y="175" width="180" height="70" rx="10" fill="#171a21" stroke="#5aa9ff"/>
+        <text x="360" y="202" text-anchor="middle" fill="#6fc3ff" font-weight="700">aigerim</text>
+        <text x="360" y="228" text-anchor="middle" fill="#e6e8ee">"Айгерим", 20</text>
+        <rect x="510" y="175" width="180" height="70" rx="10" fill="#171a21" stroke="#5aa9ff"/>
+        <text x="600" y="202" text-anchor="middle" fill="#6fc3ff" font-weight="700">bektur</text>
+        <text x="600" y="228" text-anchor="middle" fill="#e6e8ee">"Бектур", 18</text>
+      </g>
+    </svg>
+    <figcaption>Один класс — много объектов. Структура общая, значения у каждого свои.</figcaption>
+  </figure>
+
+  <div class="note"><b>Зачем это нужно</b>Без классов данные студента лежали бы в разных переменных (<code>name1</code>, <code>age1</code>, <code>name2</code>…) и функции работали бы с ними отдельно. Класс собирает данные и поведение в одно целое — так код проще читать, расширять и проверять.</div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="num">02</span>Из чего состоит класс</h2>
+  <p>Основные части класса:</p>
+  <ul>
+    <li><b>Поля</b> (fields) — переменные внутри класса, хранят состояние объекта.</li>
+    <li><b>Конструкторы</b> — специальные блоки, которые срабатывают при создании объекта.</li>
+    <li><b>Методы</b> — функции внутри класса, описывают поведение.</li>
+  </ul>
+
+<div class="codebox"><span class="lbl">Student.java</span><pre><code>public class Student {
+    // ===== Поля (состояние) =====
+    String name;
+    int age;
+    double gpa;
+
+    // ===== Конструктор =====
+    Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+        this.gpa = 0.0;
+    }
+
+    // ===== Методы (поведение) =====
+    void introduce() {
+        System.out.println("Привет, я " + name + ", мне " + age);
+    }
+
+    void study(int hours) {
+        gpa += hours * 0.01;
+        System.out.println(name + " учился " + hours + " ч.");
+    }
+}</code></pre></div>
+
+  <div class="tip"><b>Правило файла</b>В Java <code>public</code>-класс должен лежать в файле с таким же именем: <code>public class Student</code> → <code>Student.java</code>. Имена классов пишутся с большой буквы (PascalCase), поля и методы — с маленькой (camelCase).</div>
+
+  <h3>Значения полей по умолчанию</h3>
+  <p>Если поле не инициализировано, Java сама присваивает ему значение по умолчанию:</p>
+  <table>
+    <tr><th>Тип поля</th><th>Значение по умолчанию</th></tr>
+    <tr><td><code>int</code>, <code>long</code>, <code>short</code>, <code>byte</code></td><td><code>0</code></td></tr>
+    <tr><td><code>double</code>, <code>float</code></td><td><code>0.0</code></td></tr>
+    <tr><td><code>boolean</code></td><td><code>false</code></td></tr>
+    <tr><td><code>char</code></td><td><code>'\u0000'</code> (нулевой символ)</td></tr>
+    <tr><td>Любой объект (<code>String</code>, массивы, свои классы)</td><td><code>null</code></td></tr>
+  </table>
+  <div class="warn"><b>Важно</b>Это работает только для <b>полей</b>. Локальные переменные внутри методов значений по умолчанию не получают — без инициализации код не скомпилируется.</div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="num">03</span>Создание объекта и оператор new</h2>
+
+<div class="codebox"><span class="lbl">Main.java</span><pre><code>public class Main {
+    public static void main(String[] args) {
+        Student aziz = new Student("Азиз", 19);
+        Student aigerim = new Student("Айгерим", 20);
+
+        aziz.introduce();
+        aigerim.introduce();
+
+        aziz.study(5);
+        System.out.println(aziz.name + " — GPA: " + aziz.gpa);
+    }
+}</code></pre></div>
+<div class="out">Привет, я Азиз, мне 19
+Привет, я Айгерим, мне 20
+Азиз учился 5 ч.
+Азиз — GPA: 0.05</div>
+
+  <p>Разберём строку <code>Student aziz = new Student("Азиз", 19);</code></p>
+  <table>
+    <tr><th>Часть</th><th>Что делает</th></tr>
+    <tr><td><code>Student aziz</code></td><td>Объявляет переменную типа <code>Student</code>. Пока это просто «ярлык», объекта ещё нет.</td></tr>
+    <tr><td><code>new</code></td><td>Выделяет память под новый объект в куче (heap).</td></tr>
+    <tr><td><code>Student("Азиз", 19)</code></td><td>Вызывает конструктор, который заполняет поля.</td></tr>
+    <tr><td><code>=</code></td><td>Кладёт в переменную <b>ссылку</b> (адрес) на созданный объект.</td></tr>
+  </table>
+  <p>Обращение к полям и методам идёт через точку: <code>aziz.name</code>, <code>aziz.study(5)</code>.</p>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="num">04</span>Ссылки и память: стек и куча</h2>
+  <p>Переменная объектного типа хранит <b>не сам объект, а ссылку на него</b>. Сами объекты живут в куче (heap), а локальные переменные со ссылками — в стеке (stack).</p>
+
+  <figure>
+    <svg viewBox="0 0 720 230" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+      <text x="110" y="24" text-anchor="middle" fill="#9aa3b2" font-size="15" font-weight="700">СТЕК (stack)</text>
+      <text x="500" y="24" text-anchor="middle" fill="#9aa3b2" font-size="15" font-weight="700">КУЧА (heap)</text>
+      <rect x="20" y="40" width="180" height="170" rx="12" fill="#171a21" stroke="#2a2f3a"/>
+      <rect x="300" y="40" width="400" height="170" rx="12" fill="#171a21" stroke="#2a2f3a"/>
+      <g font-size="14">
+        <rect x="40" y="60" width="140" height="40" rx="8" fill="#1d212a" stroke="#f29b38"/>
+        <text x="110" y="85" text-anchor="middle" fill="#e6e8ee">a  →</text>
+        <rect x="40" y="110" width="140" height="40" rx="8" fill="#1d212a" stroke="#f29b38"/>
+        <text x="110" y="135" text-anchor="middle" fill="#e6e8ee">b  →</text>
+        <rect x="40" y="160" width="140" height="40" rx="8" fill="#1d212a" stroke="#f29b38"/>
+        <text x="110" y="185" text-anchor="middle" fill="#e6e8ee">c  →</text>
+        <rect x="330" y="65" width="200" height="55" rx="10" fill="#1d212a" stroke="#5aa9ff"/>
+        <text x="430" y="88" text-anchor="middle" fill="#6fc3ff" font-weight="700">Student #1</text>
+        <text x="430" y="108" text-anchor="middle" fill="#e6e8ee">"Азиз", 19</text>
+        <rect x="470" y="140" width="200" height="55" rx="10" fill="#1d212a" stroke="#5aa9ff"/>
+        <text x="570" y="163" text-anchor="middle" fill="#6fc3ff" font-weight="700">Student #2</text>
+        <text x="570" y="183" text-anchor="middle" fill="#e6e8ee">"Айгерим", 20</text>
+      </g>
+      <g stroke="#57c98a" stroke-width="2" fill="none" marker-end="url(#ar2)">
+        <path d="M180 80 L328 90"/><path d="M180 130 L328 100"/><path d="M180 180 L468 168"/>
+      </g>
+      <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#57c98a"/></marker></defs>
+    </svg>
+    <figcaption>a и b указывают на один и тот же объект. c — на другой.</figcaption>
+  </figure>
+
+<div class="codebox"><span class="lbl">Ссылки</span><pre><code>Student a = new Student("Азиз", 19);
+Student b = a;                        // копируется ССЫЛКА, не объект
+Student c = new Student("Айгерим", 20);
+
+b.age = 25;
+System.out.println(a.age);   // 25 — потому что a и b это один объект
+
+System.out.println(a == b);  // true  — одна и та же ссылка
+System.out.println(a == c);  // false — разные объекты</code></pre></div>
+<div class="out">25
+true
+false</div>
+
+  <h3>null</h3>
+  <p><code>null</code> означает «ссылка никуда не указывает». Вызов метода у <code>null</code> даёт ошибку <code>NullPointerException</code> во время выполнения.</p>
+<div class="codebox"><span class="lbl">NullPointerException</span><pre><code>Student s = null;
+s.introduce();   // NullPointerException</code></pre></div>
+
+  <div class="note"><b>Сборщик мусора</b>Если на объект в куче больше не указывает ни одна ссылка, он становится недостижимым, и сборщик мусора (Garbage Collector) когда-нибудь освободит его память. Вручную удалять объекты в Java не нужно.</div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="num">05</span>Конструкторы</h2>
+  <p><b>Конструктор</b> — специальный метод, который вызывается при <code>new</code>. Его задача — привести объект в корректное начальное состояние.</p>
+  <ul class="check">
+    <li>Имя совпадает с именем класса.</li>
+    <li>Нет возвращаемого типа (даже <code>void</code>).</li>
+    <li>Вызывается автоматически, один раз на объект.</li>
+  </ul>
+
+  <h3>Конструктор по умолчанию</h3>
+  <p>Если вы <b>не написали ни одного</b> конструктора, компилятор сам добавит пустой конструктор без параметров. Как только вы написали хотя бы один свой — автоматический пропадает.</p>
+<div class="codebox"><span class="lbl">Конструктор по умолчанию</span><pre><code>class Cat {
+    String name;
+}
+
+Cat c = new Cat();   // OK — компилятор создал Cat() сам
+
+class Dog {
+    String name;
+    Dog(String name) { this.name = name; }
+}
+
+Dog d = new Dog();   // ОШИБКА компиляции: Dog() больше не существует
+Dog d2 = new Dog("Рекс"); // OK</code></pre></div>
+
+  <h3>Перегрузка конструкторов</h3>
+  <p>Конструкторов может быть несколько — с разными параметрами. Java выберет нужный по количеству и типам аргументов.</p>
+<div class="codebox"><span class="lbl">Product.java</span><pre><code>public class Product {
+    String title;
+    double price;
+    int quantity;
+
+    Product(String title, double price, int quantity) {
+        this.title = title;
+        this.price = price;
+        this.quantity = quantity;
+    }
+
+    Product(String title, double price) {
+        this(title, price, 1);        // вызов другого конструктора
+    }
+
+    Product(String title) {
+        this(title, 0.0);
+    }
+}
+
+Product a = new Product("Ноутбук", 55000, 2);
+Product b = new Product("Мышь", 800);   // quantity = 1
+Product c = new Product("Подарок");      // price = 0.0, quantity = 1</code></pre></div>
+  <div class="tip"><b>Цепочка через this(...)</b>Вся логика инициализации пишется в одном «главном» конструкторе, остальные вызывают его через <code>this(...)</code>. Так нет дублирования кода. Вызов <code>this(...)</code> или <code>super(...)</code> исторически обязан быть первой инструкцией конструктора; начиная с Java 25 перед ним разрешён код, который не обращается к создаваемому объекту.</div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="num">06</span>Ключевое слово this</h2>
+  <p><code>this</code> — ссылка на <b>текущий объект</b>, тот, у которого сейчас вызван метод или конструктор. Три основных применения:</p>
+
+  <h3>1. Различить поле и параметр с одинаковым именем</h3>
+<div class="codebox"><span class="lbl">this.поле</span><pre><code>class Student {
+    String name;
+
+    Student(String name) {
+        name = name;        // ОШИБКА логики: параметр присвоен сам себе, поле осталось null
+        this.name = name;   // правильно: поле объекта = параметр
+    }
+}</code></pre></div>
+
+  <h3>2. Вызвать другой конструктор</h3>
+  <p><code>this(...)</code> — показано в разделе выше.</p>
+
+  <h3>3. Передать текущий объект куда-то ещё или вернуть его</h3>
+<div class="codebox"><span class="lbl">Цепочка вызовов</span><pre><code>class Counter {
+    int value;
+
+    Counter add(int n) {
+        value += n;
+        return this;            // возвращаем сам объект
+    }
+}
+
+Counter c = new Counter();
+c.add(5).add(10).add(3);       // цепочка вызовов
+System.out.println(c.value);   // 18</code></pre></div>
+<div class="out">18</div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="num">07</span>Модификаторы доступа</h2>
+  <p>Определяют, <b>кто может видеть</b> класс, поле или метод.</p>
+  <table>
+    <tr><th>Модификатор</th><th>Внутри класса</th><th>Тот же пакет</th><th>Наследник в другом пакете</th><th>Везде</th></tr>
+    <tr><td><code>private</code></td><td class="y">✓</td><td class="x">✗</td><td class="x">✗</td><td class="x">✗</td></tr>
+    <tr><td><i>(без модификатора)</i> — package-private</td><td class="y">✓</td><td class="y">✓</td><td class="x">✗</td><td class="x">✗</td></tr>
+    <tr><td><code>protected</code></td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="x">✗</td></tr>
+    <tr><td><code>public</code></td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td><td class="y">✓</td></tr>
+  </table>
+  <div class="tip"><b>Практическое правило</b>Поля — <code>private</code>. Методы, которыми пользуются снаружи, — <code>public</code>. Вспомогательные методы — <code>private</code>. Открывайте ровно столько, сколько нужно.</div>
+</section>
+
+<!-- 8 -->
+<section id="s8">
+  <h2><span class="num">08</span>Инкапсуляция: геттеры и сеттеры</h2>
+  <p><b>Инкапсуляция</b> — сокрытие внутреннего состояния объекта. Данные закрыты (<code>private</code>), а работа с ними идёт только через методы, которые проверяют корректность.</p>
+
+  <h3>Проблема: открытые поля</h3>
+<div class="codebox"><span class="lbl">Плохо</span><pre><code>class Student {
+    public int age;
+}
+
+Student s = new Student();
+s.age = -500;   // никто не мешает записать мусор</code></pre></div>
+
+  <h3>Решение: private + методы с проверкой</h3>
+<div class="codebox"><span class="lbl">Хорошо</span><pre><code>public class Student {
+    private String name;
+    private int age;
+
+    public Student(String name, int age) {
+        setName(name);
+        setAge(age);
+    }
+
+    // Геттер — чтение
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    // Сеттер — запись с проверкой
+    public void setName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Имя не может быть пустым");
+        }
+        this.name = name;
+    }
+
+    public void setAge(int age) {
+        if (age &lt; 0 || age > 120) {
+            throw new IllegalArgumentException("Некорректный возраст: " + age);
+        }
+        this.age = age;
+    }
+}
+
+Student s = new Student("Азиз", 19);
+s.setAge(20);                    // OK
+System.out.println(s.getAge());  // 20
+s.setAge(-500);                  // IllegalArgumentException
+// s.age = 5;                    // ошибка компиляции: age is private</code></pre></div>
+
+  <div class="note"><b>Не обязательно делать сеттер для каждого поля</b>Если поле не должно меняться после создания (например, номер счёта), оставьте только геттер. Это уже решение уровня дизайна: класс сам решает, что можно менять снаружи.</div>
+  <p>Соглашение по именам: <code>getX()</code> / <code>setX()</code>, для <code>boolean</code> — <code>isX()</code> (например, <code>isActive()</code>).</p>
+</section>
+
+<!-- 9 -->
+<section id="s9">
+  <h2><span class="num">09</span>Методы и их перегрузка</h2>
+  <p>Сигнатура метода: <code>модификатор тип_результата имя(параметры)</code>.</p>
+<div class="codebox"><span class="lbl">Методы</span><pre><code>public class Calculator {
+
+    public int add(int a, int b) {        // возвращает int
+        return a + b;
+    }
+
+    public double add(double a, double b) {   // перегрузка: другие типы
+        return a + b;
+    }
+
+    public int add(int a, int b, int c) {      // перегрузка: другое число параметров
+        return a + b + c;
+    }
+
+    public void printResult(int x) {           // void — ничего не возвращает
+        System.out.println("Результат: " + x);
+    }
+}
+
+Calculator calc = new Calculator();
+System.out.println(calc.add(2, 3));        // 5
+System.out.println(calc.add(2.5, 1.5));    // 4.0
+System.out.println(calc.add(1, 2, 3));     // 6</code></pre></div>
+<div class="out">5
+4.0
+6</div>
+
+  <div class="warn"><b>Перегрузка ≠ разный тип результата</b>Два метода, отличающиеся <b>только</b> возвращаемым типом, — ошибка компиляции. Отличаться должны параметры (количество, типы или их порядок).</div>
+
+  <h3>Передача аргументов</h3>
+  <p>В Java аргументы <b>всегда передаются по значению</b>. Для объектов «значение» — это копия ссылки. Поэтому метод может изменить содержимое объекта, но не может заменить сам объект у вызывающего кода.</p>
+<div class="codebox"><span class="lbl">Передача по значению</span><pre><code>static void rename(Student s) {
+    s.setName("Новое имя");          // меняет объект — видно снаружи
+}
+
+static void replace(Student s) {
+    s = new Student("Другой", 30);   // меняет только локальную копию ссылки
+}
+
+Student st = new Student("Азиз", 19);
+rename(st);
+System.out.println(st.getName());   // Новое имя
+replace(st);
+System.out.println(st.getName());   // Новое имя (не "Другой")</code></pre></div>
+</section>
+
+<!-- 10 -->
+<section id="s10">
+  <h2><span class="num">10</span>static: члены класса, а не объекта</h2>
+  <p>Обычные поля принадлежат <b>каждому объекту</b> отдельно. Поле с <code>static</code> принадлежит <b>классу</b> — существует в одном экземпляре и общее для всех объектов.</p>
+<div class="codebox"><span class="lbl">User.java</span><pre><code>public class User {
+    private static int count = 0;   // общий счётчик на весь класс
+    private final int id;
+    private String login;
+
+    public User(String login) {
+        count++;
+        this.id = count;
+        this.login = login;
+    }
+
+    public static int getCount() {  // static-метод
+        return count;
+    }
+
+    public int getId() { return id; }
+}
+
+User u1 = new User("aziz");
+User u2 = new User("aigerim");
+User u3 = new User("bektur");
+
+System.out.println(User.getCount());  // 3 — вызывается через имя класса
+System.out.println(u3.getId());       // 3</code></pre></div>
+<div class="out">3
+3</div>
+
+  <table>
+    <tr><th></th><th>Обычный (instance)</th><th>static</th></tr>
+    <tr><td>Принадлежит</td><td>Конкретному объекту</td><td>Классу</td></tr>
+    <tr><td>Сколько копий</td><td>По одной на объект</td><td>Одна на весь класс</td></tr>
+    <tr><td>Как вызывать</td><td><code>obj.method()</code></td><td><code>ClassName.method()</code></td></tr>
+    <tr><td>Нужен объект?</td><td>Да</td><td>Нет</td></tr>
+    <tr><td>Доступ к <code>this</code></td><td>Есть</td><td>Нет</td></tr>
+  </table>
+
+  <div class="warn"><b>Частая ошибка</b>Из <code>static</code>-метода нельзя напрямую обратиться к обычным полям и методам — нет объекта, к которому они относятся. Именно поэтому из <code>main</code> нельзя просто вызвать нестатический метод своего класса без <code>new</code>.</div>
+  <p>Примеры <code>static</code> из стандартной библиотеки: <code>Math.max()</code>, <code>Math.PI</code>, <code>Integer.parseInt()</code>, и сам <code>public static void main</code>.</p>
+</section>
+
+<!-- 11 -->
+<section id="s11">
+  <h2><span class="num">11</span>final</h2>
+  <table>
+    <tr><th>Где</th><th>Значение</th></tr>
+    <tr><td><code>final</code> поле</td><td>Присваивается один раз (в объявлении или конструкторе) и больше не меняется.</td></tr>
+    <tr><td><code>static final</code> поле</td><td>Константа класса. Имя пишут КАПСОМ: <code>MAX_ATTEMPTS</code>.</td></tr>
+    <tr><td><code>final</code> метод</td><td>Нельзя переопределить в наследнике.</td></tr>
+    <tr><td><code>final</code> класс</td><td>От него нельзя наследоваться (пример: <code>String</code>).</td></tr>
+  </table>
+<div class="codebox"><span class="lbl">final</span><pre><code>public class Config {
+    public static final int MAX_ATTEMPTS = 3;
+    public static final double TAX_RATE = 0.12;
+}
+
+final int[] arr = {1, 2, 3};
+arr[0] = 100;          // OK: меняется содержимое массива
+// arr = new int[5];   // ОШИБКА: нельзя переназначить final-ссылку</code></pre></div>
+  <div class="note"><b>final ≠ неизменяемый объект</b><code>final</code> запрещает менять саму ссылку, но не содержимое объекта, на который она указывает.</div>
+</section>
+
+<!-- 12 -->
+<section id="s12">
+  <h2><span class="num">12</span>toString, equals, hashCode</h2>
+  <p>Все классы в Java неявно наследуются от <code>Object</code> и получают от него несколько методов. Три самых важных обычно переопределяют.</p>
+
+  <h3>toString()</h3>
+  <p>По умолчанию печатает что-то вроде <code>Student@1b6d3586</code> — имя класса и хеш. Бесполезно для отладки.</p>
+<div class="codebox"><span class="lbl">toString</span><pre><code>@Override
+public String toString() {
+    return "Student{name='" + name + "', age=" + age + "}";
+}
+
+System.out.println(new Student("Азиз", 19));</code></pre></div>
+<div class="out">Student{name='Азиз', age=19}</div>
+  <p><code>println</code> и конкатенация со строкой вызывают <code>toString()</code> автоматически.</p>
+
+  <h3>equals() и ==</h3>
+  <p><code>==</code> для объектов сравнивает <b>ссылки</b> (тот же ли это объект). <code>equals()</code> по умолчанию делает то же самое, но его переопределяют, чтобы сравнивать по <b>содержимому</b>.</p>
+<div class="codebox"><span class="lbl">equals + hashCode</span><pre><code>import java.util.Objects;
+
+public class Student {
+    private String name;
+    private int age;
+
+    // ... конструктор, геттеры
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;                      // тот же объект
+        if (o == null || getClass() != o.getClass()) return false;
+        Student other = (Student) o;
+        return age == other.age &amp;&amp; Objects.equals(name, other.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+}
+
+Student a = new Student("Азиз", 19);
+Student b = new Student("Азиз", 19);
+System.out.println(a == b);       // false — разные объекты
+System.out.println(a.equals(b));  // true  — одинаковое содержимое</code></pre></div>
+
+  <div class="warn"><b>Правило</b>Переопределили <code>equals</code> — обязательно переопределите <code>hashCode</code>. Равные по <code>equals</code> объекты должны давать одинаковый <code>hashCode</code>, иначе <code>HashMap</code> и <code>HashSet</code> будут работать неправильно.</div>
+  <div class="note"><b>Строки</b>Именно поэтому строки сравнивают через <code>s1.equals(s2)</code>, а не через <code>==</code>.</div>
+  <p>IntelliJ IDEA генерирует все три метода сама: <code>Alt+Insert</code> (на macOS <code>Cmd+N</code>) → <i>toString()</i> / <i>equals() and hashCode()</i>.</p>
+</section>
+
+<!-- 13 -->
+<section id="s13">
+  <h2><span class="num">13</span>Наследование (кратко)</h2>
+  <p>Класс может расширять другой класс через <code>extends</code> и получить его поля и методы. Подробно — в отдельном посте, здесь база, чтобы было понятно, как классы связаны между собой.</p>
+<div class="codebox"><span class="lbl">Наследование</span><pre><code>public class Person {
+    protected String name;
+
+    public Person(String name) {
+        this.name = name;
+    }
+
+    public void introduce() {
+        System.out.println("Я " + name);
+    }
+}
+
+public class Student extends Person {
+    private String university;
+
+    public Student(String name, String university) {
+        super(name);                  // вызов конструктора родителя
+        this.university = university;
+    }
+
+    @Override
+    public void introduce() {         // переопределение метода
+        super.introduce();            // вызов версии родителя
+        System.out.println("Учусь в " + university);
+    }
+}
+
+Person p = new Student("Азиз", "МУА");
+p.introduce();</code></pre></div>
+<div class="out">Я Азиз
+Учусь в МУА</div>
+  <ul>
+    <li><code>extends</code> — наследование. В Java у класса может быть только один родитель.</li>
+    <li><code>super(...)</code> — вызов конструктора родителя.</li>
+    <li><code>@Override</code> — аннотация: компилятор проверит, что метод действительно переопределяет родительский.</li>
+    <li>Переменная типа родителя может хранить объект наследника — это основа полиморфизма.</li>
+  </ul>
+</section>
+
+<!-- 14 -->
+<section id="s14">
+  <h2><span class="num">14</span>Полный пример: BankAccount</h2>
+  <p>Всё вместе: <code>private</code>-поля, конструктор, валидация, <code>static</code>-счётчик, константа, <code>final</code>-поле, <code>toString</code>.</p>
+<div class="codebox"><span class="lbl">BankAccount.java</span><pre><code>public class BankAccount {
+    // Константа класса
+    public static final double MIN_DEPOSIT = 1.0;
+
+    // Общий счётчик для генерации номеров
+    private static int accountCounter = 1000;
+
+    // Состояние объекта
+    private final String accountNumber;   // не меняется после создания
+    private final String owner;
+    private double balance;
+    private final int pin;
+
+    // Конструктор
+    public BankAccount(String owner, int pin, double initialBalance) {
+        if (initialBalance &lt; 0) {
+            throw new IllegalArgumentException("Начальный баланс не может быть отрицательным");
+        }
+        accountCounter++;
+        this.accountNumber = "KG-" + accountCounter;
+        this.owner = owner;
+        this.pin = pin;
+        this.balance = initialBalance;
+    }
+
+    // Перегруженный конструктор — счёт с нулевым балансом
+    public BankAccount(String owner, int pin) {
+        this(owner, pin, 0.0);
+    }
+
+    // ===== Публичное поведение =====
+    public boolean checkPin(int input) {
+        return this.pin == input;
+    }
+
+    public void deposit(double amount) {
+        if (amount &lt; MIN_DEPOSIT) {
+            System.out.println("Минимальное пополнение: " + MIN_DEPOSIT);
+            return;
+        }
+        balance += amount;
+        System.out.println("Пополнено: " + amount + ". Баланс: " + balance);
+    }
+
+    public boolean withdraw(double amount) {
+        if (amount &lt;= 0) {
+            System.out.println("Сумма должна быть больше нуля");
+            return false;
+        }
+        if (amount > balance) {
+            System.out.println("Недостаточно средств. Баланс: " + balance);
+            return false;
+        }
+        balance -= amount;
+        System.out.println("Снято: " + amount + ". Баланс: " + balance);
+        return true;
+    }
+
+    public boolean transferTo(BankAccount target, double amount) {
+        if (target == null || target == this) {
+            System.out.println("Некорректный получатель");
+            return false;
+        }
+        if (withdraw(amount)) {
+            target.balance += amount;   // private доступен внутри того же класса
+            return true;
+        }
+        return false;
+    }
+
+    // ===== Геттеры (сеттера для balance нет намеренно) =====
+    public double getBalance()       { return balance; }
+    public String getAccountNumber() { return accountNumber; }
+    public String getOwner()         { return owner; }
+
+    @Override
+    public String toString() {
+        return accountNumber + " | " + owner + " | " + balance + " сом";
+    }
+}</code></pre></div>
+
+<div class="codebox"><span class="lbl">Main.java</span><pre><code>public class Main {
+    public static void main(String[] args) {
+        BankAccount aziz = new BankAccount("Азиз", 1234, 5000);
+        BankAccount aigerim = new BankAccount("Айгерим", 4321);
+
+        System.out.println(aziz);
+        System.out.println(aigerim);
+
+        aziz.deposit(1500);
+        aziz.withdraw(10000);
+        aziz.transferTo(aigerim, 2000);
+
+        System.out.println(aziz);
+        System.out.println(aigerim);
+        System.out.println("PIN верный? " + aziz.checkPin(1234));
+    }
+}</code></pre></div>
+<div class="out">KG-1001 | Азиз | 5000.0 сом
+KG-1002 | Айгерим | 0.0 сом
+Пополнено: 1500.0. Баланс: 6500.0
+Недостаточно средств. Баланс: 6500.0
+Снято: 2000.0. Баланс: 4500.0
+KG-1001 | Азиз | 4500.0 сом
+KG-1002 | Айгерим | 2000.0 сом
+PIN верный? true</div>
+
+  <div class="note"><b>Что здесь важно</b>
+    Баланс нельзя поменять напрямую — только через <code>deposit</code>, <code>withdraw</code>, <code>transferTo</code>, и каждый из них проверяет данные. Это и есть смысл класса: объект сам отвечает за то, чтобы его состояние всегда было корректным.
+  </div>
+  <div class="warn"><b>Для реальных денег</b><code>double</code> здесь для простоты. В настоящих финансовых расчётах используют <code>BigDecimal</code> или хранят сумму в целых тыйынах (<code>long</code>), потому что <code>double</code> даёт ошибки округления: <code>0.1 + 0.2</code> = <code>0.30000000000000004</code>.</div>
+</section>
+
+<!-- 15 -->
+<section id="s15">
+  <h2><span class="num">15</span>Частые ошибки новичков</h2>
+  <ul class="check bad">
+    <li><b><code>name = name;</code> в конструкторе</b> без <code>this</code> — поле остаётся <code>null</code>.</li>
+    <li><b>Вызов метода у <code>null</code></b> — объект объявлен, но не создан через <code>new</code> → <code>NullPointerException</code>.</li>
+    <li><b>Сравнение объектов через <code>==</code></b> вместо <code>equals()</code>, особенно строк.</li>
+    <li><b>Обращение к обычному полю из <code>static main</code></b> → ошибка «non-static variable cannot be referenced from a static context».</li>
+    <li><b>Ожидание конструктора по умолчанию</b>, когда уже написан свой с параметрами.</li>
+    <li><b>Указание <code>void</code> у конструктора</b>: <code>public void Student()</code> — это уже обычный метод, а не конструктор. Компилятор не ругается, но объект не инициализируется.</li>
+    <li><b>Все поля <code>public</code></b> — любой код может записать в объект некорректные данные.</li>
+    <li><b><code>equals</code> без <code>hashCode</code></b> — объекты «теряются» в <code>HashSet</code>/<code>HashMap</code>.</li>
+    <li><b>Класс-«бог»</b> — один класс делает всё (ввод, логику, вывод, хранение). Один класс — одна ответственность.</li>
+  </ul>
+</section>
+
+<!-- 16 -->
+<section id="s16">
+  <h2><span class="num">16</span>Шпаргалка и задание</h2>
+  <table>
+    <tr><th>Понятие</th><th>Коротко</th></tr>
+    <tr><td>Класс</td><td>Шаблон: поля + конструкторы + методы</td></tr>
+    <tr><td>Объект</td><td>Экземпляр класса, создаётся через <code>new</code></td></tr>
+    <tr><td>Поле</td><td>Данные объекта</td></tr>
+    <tr><td>Метод</td><td>Поведение объекта</td></tr>
+    <tr><td>Конструктор</td><td>Инициализация; имя = имя класса, без типа результата</td></tr>
+    <tr><td><code>this</code></td><td>Ссылка на текущий объект</td></tr>
+    <tr><td><code>private</code></td><td>Доступно только внутри класса</td></tr>
+    <tr><td>Инкапсуляция</td><td>Поля закрыты, доступ через методы с проверкой</td></tr>
+    <tr><td><code>static</code></td><td>Принадлежит классу, одно на всех</td></tr>
+    <tr><td><code>final</code></td><td>Нельзя переназначить / переопределить / наследовать</td></tr>
+    <tr><td><code>==</code> vs <code>equals</code></td><td>Ссылки vs содержимое</td></tr>
+    <tr><td><code>toString</code></td><td>Строковое представление объекта</td></tr>
+  </table>
+
+  <h3>Проверь себя</h3>
+  <details><summary>1. Чем класс отличается от объекта?</summary>Класс — описание (шаблон), объект — конкретный экземпляр в памяти, созданный по этому описанию через <code>new</code>.</details>
+  <details><summary>2. Когда компилятор создаёт конструктор по умолчанию?</summary>Только если в классе не объявлено ни одного конструктора.</details>
+  <details><summary>3. Что выведет код: <code>Student a = new Student("A",1); Student b = a; b.setAge(5); System.out.println(a.getAge());</code></summary><code>5</code>. <code>a</code> и <code>b</code> ссылаются на один и тот же объект.</details>
+  <details><summary>4. Почему из static-метода нельзя обратиться к обычному полю?</summary>Обычное поле принадлежит конкретному объекту, а static-метод вызывается без объекта — непонятно, чьё поле брать. <code>this</code> в static-контексте отсутствует.</details>
+  <details><summary>5. Зачем делать поля private, если можно public?</summary>Чтобы объект сам контролировал своё состояние: проверял входные данные и не допускал некорректных значений. Также можно менять внутреннюю реализацию, не ломая код, который использует класс.</details>
+  <details><summary>6. Что не так: <code>public void Car(String model) { this.model = model; }</code></summary>Из-за <code>void</code> это обычный метод с именем Car, а не конструктор. При <code>new Car("BMW")</code> будет ошибка компиляции, если другого подходящего конструктора нет.</details>
+
+  <h3>Практическое задание</h3>
+  <div class="tip"><b>Класс <code>Book</code> для библиотеки</b>
+    <ol>
+      <li>Поля (все <code>private</code>): <code>title</code>, <code>author</code>, <code>year</code>, <code>isAvailable</code>, <code>final</code>-поле <code>id</code>.</li>
+      <li><code>static</code>-счётчик для автоматической генерации <code>id</code>.</li>
+      <li>Два конструктора: с годом и без (год по умолчанию — 0), второй вызывает первый через <code>this(...)</code>.</li>
+      <li>Валидация: название не пустое, год от 0 до текущего.</li>
+      <li>Методы <code>borrow()</code> и <code>returnBook()</code>: нельзя взять уже выданную книгу и вернуть невыданную.</li>
+      <li>Геттеры, <code>toString()</code>, <code>equals()</code>/<code>hashCode()</code> по <code>title</code> + <code>author</code>.</li>
+      <li>В <code>main</code> создать 3 книги, выдать/вернуть их и вывести статистику через <code>static</code>-метод.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  IT &amp; Старт в разработке · Следующая тема: наследование, полиморфизм и абстрактные классы
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var KW = new Set(("public private protected class static final void int double float long short byte char boolean " +
+    "new return this super if else extends implements package import for while do switch case break continue " +
+    "true false null throw throws try catch finally interface abstract enum instanceof var record").split(" "));
+  var esc = function(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");};
+  var re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])+')|(@\w+)|(\b\d+(?:\.\d+)?\b)|(\b[A-Za-z_]\w*\b)/g;
+  document.querySelectorAll("pre code").forEach(function(el){
+    var src = el.textContent, out = "", last = 0, m;
+    re.lastIndex = 0;
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      var t = m[0], c = null;
+      if (m[1]) c = "c"; else if (m[2]) c = "s"; else if (m[3]) c = "a"; else if (m[4]) c = "n";
+      else if (m[5]) { if (KW.has(t)) c = "k"; else if (/^[A-Z]/.test(t)) c = "t"; }
+      out += c ? '<span class="' + c + '">' + esc(t) + "</span>" : esc(t);
+      last = re.lastIndex;
+    }
+    out += esc(src.slice(last));
+    el.innerHTML = out;
+  });
+  document.querySelectorAll(".codebox").forEach(function(box){
+    var b = document.createElement("button");
+    b.textContent = "Копировать";
+    b.onclick = function(){
+      var txt = box.querySelector("code").textContent;
+      var done = function(){ b.textContent = "Скопировано"; setTimeout(function(){ b.textContent = "Копировать"; }, 1500); };
+      try {
+        if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, fallback); else fallback();
+      } catch(e) { fallback(); }
+      function fallback(){
+        var ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta);
+        ta.select(); try { document.execCommand("copy"); done(); } catch(e) {} document.body.removeChild(ta);
+      }
+    };
+    box.appendChild(b);
+  });
+})();
+</script>
+</body>
+</html>

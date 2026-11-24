@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Классы в ООП на Python — полный разбор</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1d212a; --text:#e6e8ee; --muted:#9aa3b2;
+    --accent:#f29b38; --accent2:#5aa9ff; --green:#57c98a; --red:#ff6b6b; --border:#2a2f3a;
+    --code:#12141a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:17px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 20px 80px}
+  header{padding:40px 0 24px;border-bottom:1px solid var(--border);margin-bottom:28px}
+  .tag{display:inline-block;font-size:13px;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 12px;margin-bottom:14px}
+  h1{font-size:40px;line-height:1.15;margin:0 0 12px}
+  h1 span{color:var(--accent)}
+  .lead{color:var(--muted);font-size:18px;margin:0}
+  nav.toc{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin:28px 0 40px}
+  nav.toc b{display:block;margin-bottom:8px}
+  nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:28px}
+  nav.toc a{color:var(--accent2);text-decoration:none}
+  nav.toc a:hover{text-decoration:underline}
+  section{margin:56px 0}
+  h2{font-size:28px;margin:0 0 14px;display:flex;gap:12px;align-items:baseline}
+  h2 .num{color:var(--accent);font-size:20px;font-weight:700;min-width:34px}
+  h3{font-size:20px;margin:28px 0 8px;color:#fff}
+  p{margin:10px 0}
+  code{font-family:"JetBrains Mono",Consolas,Menlo,monospace;font-size:.9em}
+  :not(pre)>code{background:var(--panel2);border:1px solid var(--border);padding:1px 6px;border-radius:6px;color:#ffd29a}
+  .codebox{position:relative;margin:14px 0}
+  .codebox .lbl{position:absolute;top:0;left:0;font-size:12px;color:var(--muted);background:var(--panel2);border:1px solid var(--border);border-bottom:none;border-radius:10px 0 10px 0;padding:3px 10px}
+  .codebox button{position:absolute;top:8px;right:8px;background:var(--panel2);color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:12px;padding:4px 10px;cursor:pointer}
+  .codebox button:hover{color:#fff}
+  pre{background:var(--code);border:1px solid var(--border);border-radius:12px;padding:34px 18px 16px;overflow-x:auto;margin:0;line-height:1.55}
+  pre code{font-size:14.5px;color:#d7dae0}
+  .k{color:#ff8f5a}.t{color:#6fc3ff}.s{color:#9be28a}.c{color:#6b7385;font-style:italic}.n{color:#d9a6ff}.a{color:#ffd166}
+  .out{background:#0b0d11;border:1px dashed var(--border);border-radius:10px;padding:10px 16px;font-family:Consolas,Menlo,monospace;font-size:14px;color:var(--green);white-space:pre;overflow-x:auto;margin:8px 0 16px}
+  .out::before{content:"Вывод:";display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+  .note,.warn,.tip{border-radius:12px;padding:14px 18px;margin:16px 0;border:1px solid}
+  .note{background:rgba(90,169,255,.08);border-color:rgba(90,169,255,.35)}
+  .warn{background:rgba(255,107,107,.08);border-color:rgba(255,107,107,.35)}
+  .tip{background:rgba(87,201,138,.08);border-color:rgba(87,201,138,.35)}
+  .note b:first-child,.warn b:first-child,.tip b:first-child{display:block;margin-bottom:4px}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px;background:var(--panel);border-radius:12px;overflow:hidden}
+  th,td{border-bottom:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted);font-weight:600}
+  td.y{color:var(--green);text-align:center}td.x{color:var(--red);text-align:center}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+  .card h4{margin:0 0 6px;color:var(--accent)}
+  figure{margin:20px 0;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px}
+  figcaption{color:var(--muted);font-size:14px;text-align:center;margin-top:8px}
+  svg{width:100%;height:auto;display:block}
+  details{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin:10px 0}
+  summary{cursor:pointer;font-weight:600}
+  details[open] summary{margin-bottom:8px;color:var(--accent)}
+  ul.check{list-style:none;padding:0}
+  ul.check li{padding-left:28px;position:relative;margin:6px 0}
+  ul.check li::before{content:"✓";position:absolute;left:4px;color:var(--green);font-weight:700}
+  ul.bad li::before{content:"✗";color:var(--red)}
+  footer{margin-top:70px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:14px;text-align:center}
+  @media (max-width:640px){h1{font-size:30px}nav.toc ol{columns:1}.grid2{grid-template-columns:1fr}body{font-size:16px}}
+</style>
+<style>
+  :root{--accent:#ffd43b;--accent2:#5aa9ff}
+  .v{color:#ff9ecb;font-style:italic}.b{color:#7fe0d0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="tag">IT &amp; Старт в разработке · Python · ООП</div>
+  <h1>Классы в ООП: <span>полный разбор</span> на Python</h1>
+  <p class="lead">Что такое класс, <code>__init__</code> и <code>self</code>, атрибуты класса и объекта, инкапсуляция и <code>@property</code>, <code>@staticmethod</code> и <code>@classmethod</code>, магические методы, наследование, <code>dataclass</code> и полный пример. В конце — сравнение с Java.</p>
+</header>
+
+<nav class="toc">
+  <b>Содержание</b>
+  <ol>
+    <li><a href="#s1">Что такое класс и объект</a></li>
+    <li><a href="#s2">Из чего состоит класс</a></li>
+    <li><a href="#s3">Создание объекта</a></li>
+    <li><a href="#s4">Ссылки, is и ==</a></li>
+    <li><a href="#s5">self</a></li>
+    <li><a href="#s6">__init__ и «перегрузка»</a></li>
+    <li><a href="#s7">Атрибуты класса и объекта</a></li>
+    <li><a href="#s8">Инкапсуляция: _ и __</a></li>
+    <li><a href="#s9">@property</a></li>
+    <li><a href="#s10">Обычные, static и class-методы</a></li>
+    <li><a href="#s11">Магические методы</a></li>
+    <li><a href="#s12">Наследование (кратко)</a></li>
+    <li><a href="#s13">dataclass</a></li>
+    <li><a href="#s14">Полный пример: BankAccount</a></li>
+    <li><a href="#s15">Частые ошибки</a></li>
+    <li><a href="#s16">Python vs Java</a></li>
+    <li><a href="#s17">Шпаргалка и задание</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="num">01</span>Что такое класс и объект</h2>
+  <p><b>Класс</b> — шаблон, который описывает, какие данные будут у объектов и что они умеют делать.</p>
+  <p><b>Объект</b> (экземпляр) — конкретная вещь, созданная по шаблону, со своими значениями.</p>
+  <div class="grid2">
+    <div class="card"><h4>Класс = чертёж</h4>«У дома есть адрес, этажи, цвет». Жить в чертеже нельзя.</div>
+    <div class="card"><h4>Объект = дом</h4>ул. Ленина 5, 9 этажей, белый. По одному чертежу — сколько угодно домов.</div>
+  </div>
+  <figure>
+    <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+      <rect x="250" y="10" width="220" height="110" rx="12" fill="#1d212a" stroke="#ffd43b" stroke-width="2"/>
+      <text x="360" y="38" text-anchor="middle" fill="#ffd43b" font-size="18" font-weight="700">class Student</text>
+      <line x1="262" y1="50" x2="458" y2="50" stroke="#2a2f3a"/>
+      <text x="270" y="74" fill="#e6e8ee" font-size="14">name, age</text>
+      <text x="270" y="100" fill="#e6e8ee" font-size="14">study(), introduce()</text>
+      <g stroke="#5aa9ff" stroke-width="2" fill="none" marker-end="url(#ar)">
+        <path d="M300 122 L120 170"/><path d="M360 122 L360 170"/><path d="M420 122 L600 170"/>
+      </g>
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#5aa9ff"/></marker></defs>
+      <text x="170" y="150" fill="#9aa3b2" font-size="13">Student(...)</text>
+      <text x="368" y="152" fill="#9aa3b2" font-size="13">Student(...)</text>
+      <text x="490" y="150" fill="#9aa3b2" font-size="13">Student(...)</text>
+      <g font-size="14">
+        <rect x="30" y="175" width="180" height="70" rx="10" fill="#171a21" stroke="#5aa9ff"/>
+        <text x="120" y="202" text-anchor="middle" fill="#6fc3ff" font-weight="700">aziz</text>
+        <text x="120" y="228" text-anchor="middle" fill="#e6e8ee">"Азиз", 19</text>
+        <rect x="270" y="175" width="180" height="70" rx="10" fill="#171a21" stroke="#5aa9ff"/>
+        <text x="360" y="202" text-anchor="middle" fill="#6fc3ff" font-weight="700">aigerim</text>
+        <text x="360" y="228" text-anchor="middle" fill="#e6e8ee">"Айгерим", 20</text>
+        <rect x="510" y="175" width="180" height="70" rx="10" fill="#171a21" stroke="#5aa9ff"/>
+        <text x="600" y="202" text-anchor="middle" fill="#6fc3ff" font-weight="700">bektur</text>
+        <text x="600" y="228" text-anchor="middle" fill="#e6e8ee">"Бектур", 18</text>
+      </g>
+    </svg>
+    <figcaption>Один класс — много объектов. Структура общая, значения у каждого свои.</figcaption>
+  </figure>
+  <div class="note"><b>В Python всё — объект</b>Числа, строки, списки, функции и даже сами классы — объекты. <code>type(5)</code> вернёт <code>&lt;class 'int'&gt;</code>: число 5 — экземпляр класса <code>int</code>. Когда вы пишете свой класс, вы создаёте новый тип данных наравне со встроенными.</div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="num">02</span>Из чего состоит класс</h2>
+  <ul>
+    <li><b>Атрибуты</b> — данные объекта (аналог полей в Java).</li>
+    <li><b><code>__init__</code></b> — инициализатор, выполняется при создании объекта и заполняет атрибуты.</li>
+    <li><b>Методы</b> — функции внутри класса. Первый параметр — <code>self</code>.</li>
+  </ul>
+<div class="codebox"><span class="lbl">student.py</span><pre><code>class Student:
+    # ===== Инициализатор =====
+    def __init__(self, name, age):
+        # Атрибуты объекта создаются прямо здесь
+        self.name = name
+        self.age = age
+        self.gpa = 0.0
+
+    # ===== Методы (поведение) =====
+    def introduce(self):
+        print(f"Привет, я {self.name}, мне {self.age}")
+
+    def study(self, hours):
+        self.gpa += hours * 0.01
+        print(f"{self.name} учился {hours} ч.")</code></pre></div>
+  <div class="tip"><b>Соглашения (PEP 8)</b>Имена классов — <code>PascalCase</code> (<code>BankAccount</code>), методов и атрибутов — <code>snake_case</code> (<code>get_balance</code>). Отступ — 4 пробела. Пустой класс пишется как <code>class Empty: pass</code>.</div>
+  <div class="note"><b>Отличие от Java</b>Атрибуты не объявляются заранее с типами. Они появляются в момент присваивания <code>self.name = ...</code>. Поэтому все атрибуты принято создавать в <code>__init__</code> — так сразу видно, из чего состоит объект.</div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="num">03</span>Создание объекта</h2>
+  <p>Слова <code>new</code> в Python нет. Класс вызывается как функция:</p>
+<div class="codebox"><span class="lbl">main.py</span><pre><code>aziz = Student("Азиз", 19)
+aigerim = Student("Айгерим", 20)
+
+aziz.introduce()
+aigerim.introduce()
+
+aziz.study(5)
+print(aziz.name, "— GPA:", aziz.gpa)</code></pre></div>
+<div class="out">Привет, я Азиз, мне 19
+Привет, я Айгерим, мне 20
+Азиз учился 5 ч.
+Азиз — GPA: 0.05</div>
+  <p>Что происходит при <code>Student("Азиз", 19)</code>:</p>
+  <table>
+    <tr><th>Шаг</th><th>Что делает</th></tr>
+    <tr><td>1. <code>Student.__new__(Student)</code></td><td>Создаёт пустой объект в памяти. Переопределять его почти никогда не нужно.</td></tr>
+    <tr><td>2. <code>obj.__init__("Азиз", 19)</code></td><td>Заполняет атрибуты. Python сам передаёт объект в <code>self</code>.</td></tr>
+    <tr><td>3. <code>aziz = obj</code></td><td>Имя <code>aziz</code> начинает ссылаться на этот объект.</td></tr>
+  </table>
+  <div class="note"><b>__init__ — не совсем конструктор</b>Формально объект создаёт <code>__new__</code>, а <code>__init__</code> только инициализирует его. На практике <code>__init__</code> всё равно называют конструктором — так проще.</div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="num">04</span>Ссылки, is и ==</h2>
+  <p>Переменная в Python — это <b>имя, привязанное к объекту</b>. Присваивание не копирует объект, а привязывает ещё одно имя к тому же объекту.</p>
+  <figure>
+    <svg viewBox="0 0 720 230" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Arial,sans-serif">
+      <text x="110" y="24" text-anchor="middle" fill="#9aa3b2" font-size="15" font-weight="700">ИМЕНА</text>
+      <text x="500" y="24" text-anchor="middle" fill="#9aa3b2" font-size="15" font-weight="700">ОБЪЕКТЫ</text>
+      <rect x="20" y="40" width="180" height="170" rx="12" fill="#171a21" stroke="#2a2f3a"/>
+      <rect x="300" y="40" width="400" height="170" rx="12" fill="#171a21" stroke="#2a2f3a"/>
+      <g font-size="14">
+        <rect x="40" y="60" width="140" height="40" rx="8" fill="#1d212a" stroke="#ffd43b"/>
+        <text x="110" y="85" text-anchor="middle" fill="#e6e8ee">a  →</text>
+        <rect x="40" y="110" width="140" height="40" rx="8" fill="#1d212a" stroke="#ffd43b"/>
+        <text x="110" y="135" text-anchor="middle" fill="#e6e8ee">b  →</text>
+        <rect x="40" y="160" width="140" height="40" rx="8" fill="#1d212a" stroke="#ffd43b"/>
+        <text x="110" y="185" text-anchor="middle" fill="#e6e8ee">c  →</text>
+        <rect x="330" y="65" width="200" height="55" rx="10" fill="#1d212a" stroke="#5aa9ff"/>
+        <text x="430" y="88" text-anchor="middle" fill="#6fc3ff" font-weight="700">Student #1</text>
+        <text x="430" y="108" text-anchor="middle" fill="#e6e8ee">"Азиз", 19</text>
+        <rect x="470" y="140" width="200" height="55" rx="10" fill="#1d212a" stroke="#5aa9ff"/>
+        <text x="570" y="163" text-anchor="middle" fill="#6fc3ff" font-weight="700">Student #2</text>
+        <text x="570" y="183" text-anchor="middle" fill="#e6e8ee">"Айгерим", 20</text>
+      </g>
+      <g stroke="#57c98a" stroke-width="2" fill="none" marker-end="url(#ar2)">
+        <path d="M180 80 L328 90"/><path d="M180 130 L328 100"/><path d="M180 180 L468 168"/>
+      </g>
+      <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#57c98a"/></marker></defs>
+    </svg>
+    <figcaption>a и b — два имени одного объекта. c — другой объект.</figcaption>
+  </figure>
+<div class="codebox"><span class="lbl">Ссылки</span><pre><code>a = Student("Азиз", 19)
+b = a                      # второе имя для того же объекта
+c = Student("Айгерим", 20)
+
+b.age = 25
+print(a.age)       # 25
+
+print(a is b)      # True  — один и тот же объект
+print(a is c)      # False
+print(id(a) == id(b))  # True — id() это «адрес» объекта</code></pre></div>
+<div class="out">25
+True
+False
+True</div>
+  <table>
+    <tr><th>Оператор</th><th>Сравнивает</th><th>Аналог в Java</th></tr>
+    <tr><td><code>is</code></td><td>Тот же ли это объект</td><td><code>==</code> для объектов</td></tr>
+    <tr><td><code>==</code></td><td>Равны ли по значению (вызывает <code>__eq__</code>)</td><td><code>equals()</code></td></tr>
+  </table>
+
+  <h3>None</h3>
+  <p><code>None</code> — «нет значения», аналог <code>null</code>. Проверять через <code>is</code>: <code>if x is None:</code>. Обращение к атрибуту у <code>None</code> даёт <code>AttributeError</code>:</p>
+<div class="codebox"><span class="lbl">AttributeError</span><pre><code>s = None
+s.introduce()   # AttributeError: 'NoneType' object has no attribute 'introduce'</code></pre></div>
+  <div class="note"><b>Память</b>Объект удаляется автоматически, когда на него не остаётся ссылок (в CPython — подсчёт ссылок плюс сборщик мусора для циклических ссылок). Вручную освобождать память не нужно.</div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="num">05</span>self</h2>
+  <p><code>self</code> — ссылка на текущий объект, аналог <code>this</code> в Java. Отличие: в Python его нужно <b>явно писать первым параметром</b> каждого обычного метода.</p>
+<div class="codebox"><span class="lbl">Как работает self</span><pre><code>aziz = Student("Азиз", 19)
+
+aziz.introduce()            # обычная запись
+Student.introduce(aziz)     # то же самое — так Python делает «под капотом»</code></pre></div>
+<div class="out">Привет, я Азиз, мне 19
+Привет, я Азиз, мне 19</div>
+  <p>Объект слева от точки автоматически подставляется в <code>self</code>.</p>
+  <div class="warn"><b>self — не ключевое слово</b>Технически параметр можно назвать как угодно, но все пишут <code>self</code>. Другое имя — нарушение соглашения, так не делают.</div>
+  <h3>Без self атрибут не создастся</h3>
+<div class="codebox"><span class="lbl">Ошибка</span><pre><code>class Student:
+    def __init__(self, name):
+        name = name          # просто локальная переменная, исчезнет после __init__
+
+s = Student("Азиз")
+print(s.name)               # AttributeError: 'Student' object has no attribute 'name'</code></pre></div>
+  <h3>Возврат self для цепочки вызовов</h3>
+<div class="codebox"><span class="lbl">Цепочка</span><pre><code>class Counter:
+    def __init__(self):
+        self.value = 0
+
+    def add(self, n):
+        self.value += n
+        return self
+
+c = Counter()
+c.add(5).add(10).add(3)
+print(c.value)   # 18</code></pre></div>
+<div class="out">18</div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="num">06</span>__init__ и «перегрузка»</h2>
+  <p>В Python <b>нет перегрузки</b> методов и конструкторов по количеству параметров. Если написать два <code>__init__</code>, второй просто заменит первый. Вместо этого используют:</p>
+  <h3>1. Значения по умолчанию</h3>
+<div class="codebox"><span class="lbl">product.py</span><pre><code>class Product:
+    def __init__(self, title, price=0.0, quantity=1):
+        self.title = title
+        self.price = price
+        self.quantity = quantity
+
+a = Product("Ноутбук", 55000, 2)
+b = Product("Мышь", 800)            # quantity = 1
+c = Product("Подарок")              # price = 0.0, quantity = 1
+d = Product("Кабель", quantity=5)   # именованный аргумент</code></pre></div>
+
+  <h3>2. Альтернативные конструкторы через @classmethod</h3>
+<div class="codebox"><span class="lbl">from_string</span><pre><code>class Product:
+    def __init__(self, title, price=0.0, quantity=1):
+        self.title = title
+        self.price = price
+        self.quantity = quantity
+
+    @classmethod
+    def from_string(cls, line):
+        # "Ноутбук;55000;2" -> Product
+        title, price, qty = line.split(";")
+        return cls(title, float(price), int(qty))
+
+p = Product.from_string("Ноутбук;55000;2")
+print(p.title, p.price, p.quantity)</code></pre></div>
+<div class="out">Ноутбук 55000.0 2</div>
+  <p>Так устроены стандартные классы: <code>dict.fromkeys(...)</code>, <code>datetime.fromtimestamp(...)</code>.</p>
+
+  <div class="warn"><b>Ловушка: изменяемое значение по умолчанию</b>Значение по умолчанию вычисляется <b>один раз</b>, при определении функции. Список по умолчанию окажется общим для всех объектов.</div>
+<div class="codebox"><span class="lbl">Ловушка со списком</span><pre><code># ПЛОХО
+class Group:
+    def __init__(self, students=[]):
+        self.students = students
+
+g1 = Group()
+g2 = Group()
+g1.students.append("Азиз")
+print(g2.students)   # ['Азиз'] — список общий!
+
+# ПРАВИЛЬНО
+class Group:
+    def __init__(self, students=None):
+        self.students = students if students is not None else []</code></pre></div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="num">07</span>Атрибуты класса и атрибуты объекта</h2>
+  <p>Атрибут, объявленный прямо в теле класса (не через <code>self</code>), принадлежит <b>классу</b> и общий для всех объектов — аналог <code>static</code>-поля в Java.</p>
+<div class="codebox"><span class="lbl">user.py</span><pre><code>class User:
+    count = 0                   # атрибут класса
+    MAX_LOGIN_LENGTH = 20       # «константа» (по соглашению — КАПСОМ)
+
+    def __init__(self, login):
+        User.count += 1         # меняем через имя класса
+        self.id = User.count    # атрибут объекта
+        self.login = login
+
+u1 = User("aziz")
+u2 = User("aigerim")
+u3 = User("bektur")
+
+print(User.count)   # 3
+print(u3.id)        # 3
+print(u1.count)     # 3 — чтение через объект тоже работает</code></pre></div>
+<div class="out">3
+3
+3</div>
+
+  <div class="warn"><b>Ловушка: запись через self</b><code>self.count += 1</code> НЕ изменит атрибут класса. Python прочитает <code>User.count</code>, прибавит 1 и создаст <b>новый</b> атрибут у объекта, который перекроет классовый. Менять атрибут класса нужно через имя класса или <code>cls</code>.</div>
+<div class="codebox"><span class="lbl">Как Python ищет атрибут</span><pre><code>class A:
+    x = 10
+
+obj = A()
+print(obj.x)      # 10 — нет у объекта, найден у класса
+obj.x = 99        # создан атрибут у объекта
+print(obj.x)      # 99 — объект
+print(A.x)        # 10 — класс не изменился
+print(obj.__dict__)   # {'x': 99} — атрибуты самого объекта</code></pre></div>
+<div class="out">10
+99
+10
+{'x': 99}</div>
+  <p>Порядок поиска: сначала атрибуты объекта (<code>obj.__dict__</code>), потом класса, потом родительских классов.</p>
+  <div class="note"><b>Констант нет</b>В Python нет аналога <code>final</code>. <code>MAX_LOGIN_LENGTH</code> технически можно изменить — капс лишь сигнал «не трогай». Для проверок типов есть <code>typing.Final</code>, но в рантайме он ничего не запрещает.</div>
+</section>
+
+<!-- 8 -->
+<section id="s8">
+  <h2><span class="num">08</span>Инкапсуляция: _ и __</h2>
+  <p>В Python <b>нет</b> <code>private</code>/<code>protected</code>/<code>public</code>. Доступ ко всему открыт, а «закрытость» обозначается соглашениями об именах.</p>
+  <table>
+    <tr><th>Имя</th><th>Смысл</th><th>Что делает Python</th></tr>
+    <tr><td><code>name</code></td><td>Публичный</td><td>Ничего</td></tr>
+    <tr><td><code>_name</code></td><td>Внутренний («protected» по договорённости)</td><td>Ничего. Только сигнал: «не трогай снаружи». <code>from module import *</code> такие имена не импортирует.</td></tr>
+    <tr><td><code>__name</code></td><td>«Приватный»</td><td>Переименовывает в <code>_ИмяКласса__name</code> (name mangling)</td></tr>
+    <tr><td><code>__name__</code></td><td>Специальный (магический)</td><td>Зарезервировано для языка. Свои такие имена не придумывают.</td></tr>
+  </table>
+<div class="codebox"><span class="lbl">Name mangling</span><pre><code>class Account:
+    def __init__(self, balance):
+        self._owner = "Азиз"      # внутренний
+        self.__balance = balance   # «приватный»
+
+acc = Account(1000)
+print(acc._owner)               # Азиз — доступно, но так делать не принято
+# print(acc.__balance)          # AttributeError
+print(acc._Account__balance)    # 1000 — обход возможен, защита не абсолютная</code></pre></div>
+<div class="out">Азиз
+1000</div>
+  <div class="tip"><b>На практике</b>Чаще всего используют одно подчёркивание <code>_</code>. Двойное нужно в основном, чтобы атрибут случайно не перекрылся в классе-наследнике. Принцип Python: «мы все взрослые люди» — язык не запрещает, а договаривается.</div>
+</section>
+
+<!-- 9 -->
+<section id="s9">
+  <h2><span class="num">09</span>@property: геттеры и сеттеры по-питоновски</h2>
+  <p>Методы <code>get_age()</code>/<code>set_age()</code> как в Java в Python не пишут. Вместо них — <code>@property</code>: снаружи это выглядит как обычный атрибут, а внутри выполняется метод с проверкой.</p>
+<div class="codebox"><span class="lbl">student.py</span><pre><code>class Student:
+    def __init__(self, name, age):
+        self.name = name      # уже идёт через сеттер ниже
+        self.age = age
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        if not value or not value.strip():
+            raise ValueError("Имя не может быть пустым")
+        self._name = value
+
+    @property
+    def age(self):
+        return self._age
+
+    @age.setter
+    def age(self, value):
+        if not 0 &lt;= value &lt;= 120:
+            raise ValueError(f"Некорректный возраст: {value}")
+        self._age = value
+
+    @property
+    def is_adult(self):       # вычисляемое свойство, только чтение
+        return self._age >= 18
+
+
+s = Student("Азиз", 19)
+s.age = 20                 # вызывается сеттер
+print(s.age)               # 20 — вызывается геттер
+print(s.is_adult)          # True
+s.age = -500               # ValueError: Некорректный возраст: -500</code></pre></div>
+  <ul class="check">
+    <li>Синтаксис для пользователя класса простой: <code>s.age = 20</code>, без скобок.</li>
+    <li>Проверка срабатывает и в <code>__init__</code>, потому что там тоже <code>self.age = ...</code>.</li>
+    <li>Свойство без <code>.setter</code> доступно только для чтения: <code>s.is_adult = False</code> → <code>AttributeError</code>.</li>
+  </ul>
+  <div class="tip"><b>Когда нужен property</b>Не оборачивайте каждый атрибут. Начинайте с обычного <code>self.age</code>. Если позже понадобится проверка — замените на <code>@property</code>: код, который использует класс, менять не придётся.</div>
+</section>
+
+<!-- 10 -->
+<section id="s10">
+  <h2><span class="num">10</span>Обычные, static- и class-методы</h2>
+<div class="codebox"><span class="lbl">Три вида методов</span><pre><code>class Temperature:
+    unit = "°C"
+
+    def __init__(self, celsius):
+        self.celsius = celsius
+
+    # Обычный метод: работает с конкретным объектом через self
+    def to_fahrenheit(self):
+        return self.celsius * 9 / 5 + 32
+
+    # Метод класса: получает класс через cls
+    @classmethod
+    def from_fahrenheit(cls, f):
+        return cls((f - 32) * 5 / 9)
+
+    # Статический метод: не получает ни self, ни cls
+    @staticmethod
+    def is_valid(celsius):
+        return celsius >= -273.15
+
+
+t = Temperature(25)
+print(t.to_fahrenheit())                    # 77.0
+print(Temperature.from_fahrenheit(212).celsius)  # 100.0
+print(Temperature.is_valid(-300))           # False</code></pre></div>
+<div class="out">77.0
+100.0
+False</div>
+  <table>
+    <tr><th></th><th>Обычный</th><th><code>@classmethod</code></th><th><code>@staticmethod</code></th></tr>
+    <tr><td>Первый параметр</td><td><code>self</code> (объект)</td><td><code>cls</code> (класс)</td><td>нет</td></tr>
+    <tr><td>Доступ к атрибутам объекта</td><td class="y">✓</td><td class="x">✗</td><td class="x">✗</td></tr>
+    <tr><td>Доступ к атрибутам класса</td><td class="y">✓</td><td class="y">✓</td><td class="x">✗ (только через имя класса)</td></tr>
+    <tr><td>Типичное применение</td><td>Поведение объекта</td><td>Альтернативные конструкторы, работа со счётчиками класса</td><td>Вспомогательная функция, логически связанная с классом</td></tr>
+    <tr><td>Аналог в Java</td><td>обычный метод</td><td>ближе всего — static-фабрика</td><td><code>static</code>-метод</td></tr>
+  </table>
+  <div class="note"><b>Почему cls лучше имени класса</b>Если от <code>Temperature</code> унаследуется класс <code>Weather</code>, то <code>Weather.from_fahrenheit(...)</code> вернёт объект <code>Weather</code>, потому что <code>cls</code> — это тот класс, через который вызвали метод.</div>
+</section>
+
+<!-- 11 -->
+<section id="s11">
+  <h2><span class="num">11</span>Магические методы (dunder)</h2>
+  <p>Методы вида <code>__имя__</code> Python вызывает сам в определённых ситуациях. С их помощью свой класс начинает работать с <code>print</code>, <code>==</code>, <code>+</code>, <code>len()</code> и т. д.</p>
+  <table>
+    <tr><th>Метод</th><th>Когда вызывается</th></tr>
+    <tr><td><code>__init__</code></td><td><code>Cls(...)</code> — инициализация</td></tr>
+    <tr><td><code>__str__</code></td><td><code>print(obj)</code>, <code>str(obj)</code>, f-строки — текст для пользователя</td></tr>
+    <tr><td><code>__repr__</code></td><td>Консоль, отладка, объект внутри списка — текст для разработчика</td></tr>
+    <tr><td><code>__eq__</code></td><td><code>a == b</code></td></tr>
+    <tr><td><code>__lt__</code>, <code>__gt__</code>…</td><td><code>&lt;</code>, <code>&gt;</code>; нужны для <code>sorted()</code></td></tr>
+    <tr><td><code>__hash__</code></td><td><code>hash(obj)</code>, ключи <code>dict</code>, элементы <code>set</code></td></tr>
+    <tr><td><code>__len__</code></td><td><code>len(obj)</code></td></tr>
+    <tr><td><code>__add__</code></td><td><code>a + b</code></td></tr>
+    <tr><td><code>__getitem__</code></td><td><code>obj[i]</code></td></tr>
+    <tr><td><code>__contains__</code></td><td><code>x in obj</code></td></tr>
+  </table>
+<div class="codebox"><span class="lbl">money.py</span><pre><code>class Money:
+    def __init__(self, amount, currency="KGS"):
+        self.amount = amount
+        self.currency = currency
+
+    def __str__(self):
+        return f"{self.amount} {self.currency}"
+
+    def __repr__(self):
+        return f"Money({self.amount!r}, {self.currency!r})"
+
+    def __eq__(self, other):
+        if not isinstance(other, Money):
+            return NotImplemented
+        return self.amount == other.amount and self.currency == other.currency
+
+    def __hash__(self):
+        return hash((self.amount, self.currency))
+
+    def __add__(self, other):
+        if self.currency != other.currency:
+            raise ValueError("Разные валюты")
+        return Money(self.amount + other.amount, self.currency)
+
+    def __lt__(self, other):
+        return self.amount &lt; other.amount
+
+
+a = Money(500)
+b = Money(300)
+print(a)                    # __str__
+print([a, b])               # __repr__ внутри списка
+print(a + b)                # __add__
+print(a == Money(500))      # __eq__
+print(sorted([a, b]))       # __lt__
+print(len({a, Money(500)})) # __hash__: одинаковые объекты в set — один элемент</code></pre></div>
+<div class="out">500 KGS
+[Money(500, 'KGS'), Money(300, 'KGS')]
+800 KGS
+True
+[Money(300, 'KGS'), Money(500, 'KGS')]
+1</div>
+  <div class="warn"><b>__eq__ и __hash__</b>Если вы определили <code>__eq__</code>, но не <code>__hash__</code>, Python делает объект <b>нехешируемым</b>: его нельзя положить в <code>set</code> или использовать ключом <code>dict</code> (<code>TypeError: unhashable type</code>). Равные объекты обязаны иметь одинаковый хеш.</div>
+  <div class="note"><b>Без __str__ и __repr__</b><code>print(obj)</code> выведет что-то вроде <code>&lt;__main__.Money object at 0x7f...&gt;</code>. Если определён только <code>__repr__</code>, его использует и <code>print</code>.</div>
+</section>
+
+<!-- 12 -->
+<section id="s12">
+  <h2><span class="num">12</span>Наследование (кратко)</h2>
+<div class="codebox"><span class="lbl">Наследование</span><pre><code>class Person:
+    def __init__(self, name):
+        self.name = name
+
+    def introduce(self):
+        print(f"Я {self.name}")
+
+
+class Student(Person):                 # Student наследует Person
+    def __init__(self, name, university):
+        super().__init__(name)         # вызов __init__ родителя
+        self.university = university
+
+    def introduce(self):               # переопределение
+        super().introduce()
+        print(f"Учусь в {self.university}")
+
+
+p = Student("Азиз", "МУА")
+p.introduce()
+print(isinstance(p, Person))     # True
+print(issubclass(Student, Person))  # True</code></pre></div>
+<div class="out">Я Азиз
+Учусь в МУА
+True
+True</div>
+  <ul>
+    <li>Родитель указывается в скобках: <code>class Student(Person)</code>.</li>
+    <li><code>super()</code> — доступ к методам родителя.</li>
+    <li>Если в наследнике есть свой <code>__init__</code>, родительский <b>не вызывается автоматически</b> — нужен <code>super().__init__(...)</code>.</li>
+    <li>В отличие от Java, разрешено <b>множественное наследование</b>: <code>class C(A, B)</code>. Порядок поиска методов задаёт MRO (<code>C.__mro__</code>).</li>
+    <li>Все классы неявно наследуются от <code>object</code>.</li>
+  </ul>
+</section>
+
+<!-- 13 -->
+<section id="s13">
+  <h2><span class="num">13</span>dataclass: класс без шаблонного кода</h2>
+  <p>Для классов, которые в основном хранят данные, есть декоратор <code>@dataclass</code> (Python 3.7+). Он сам генерирует <code>__init__</code>, <code>__repr__</code> и <code>__eq__</code>.</p>
+<div class="codebox"><span class="lbl">dataclass</span><pre><code>from dataclasses import dataclass, field
+
+@dataclass
+class Book:
+    title: str
+    author: str
+    year: int = 0
+    tags: list = field(default_factory=list)   # безопасный изменяемый default
+
+    def is_classic(self):
+        return 0 &lt; self.year &lt; 1950
+
+
+b1 = Book("Джамиля", "Чингиз Айтматов", 1958)
+b2 = Book("Джамиля", "Чингиз Айтматов", 1958)
+
+print(b1)            # __repr__ сгенерирован
+print(b1 == b2)      # __eq__ сгенерирован
+print(b1.is_classic())</code></pre></div>
+<div class="out">Book(title='Джамиля', author='Чингиз Айтматов', year=1958, tags=[])
+True
+False</div>
+  <p>Полезные параметры: <code>@dataclass(frozen=True)</code> — объект нельзя изменить после создания (и он становится хешируемым); <code>order=True</code> — генерирует <code>&lt;</code>, <code>&gt;</code> для сортировки. Аннотации типов (<code>title: str</code>) Python в рантайме не проверяет.</p>
+  <div class="note"><b>Аналог в Java</b>Ближайший аналог — <code>record</code> (Java 16+).</div>
+</section>
+
+<!-- 14 -->
+<section id="s14">
+  <h2><span class="num">14</span>Полный пример: BankAccount</h2>
+  <p>Всё вместе: атрибуты класса, «приватные» атрибуты, <code>@property</code> только для чтения, валидация, <code>@classmethod</code>, <code>@staticmethod</code>, <code>__str__</code>/<code>__repr__</code>.</p>
+<div class="codebox"><span class="lbl">bank_account.py</span><pre><code>class BankAccount:
+    MIN_DEPOSIT = 1.0            # «константа» класса
+    _counter = 1000              # счётчик для номеров счетов
+
+    def __init__(self, owner, pin, initial_balance=0.0):
+        if initial_balance &lt; 0:
+            raise ValueError("Начальный баланс не может быть отрицательным")
+        BankAccount._counter += 1
+        self._number = f"KG-{BankAccount._counter}"
+        self._owner = owner
+        self.__pin = pin
+        self._balance = initial_balance
+
+    # ===== Альтернативный конструктор =====
+    @classmethod
+    def from_string(cls, line):
+        # "Азиз;1234;5000"
+        owner, pin, balance = line.split(";")
+        return cls(owner, int(pin), float(balance))
+
+    # ===== Свойства только для чтения =====
+    @property
+    def balance(self):
+        return self._balance
+
+    @property
+    def number(self):
+        return self._number
+
+    @property
+    def owner(self):
+        return self._owner
+
+    # ===== Поведение =====
+    def check_pin(self, value):
+        return self.__pin == value
+
+    def deposit(self, amount):
+        if amount &lt; self.MIN_DEPOSIT:
+            print(f"Минимальное пополнение: {self.MIN_DEPOSIT}")
+            return
+        self._balance += amount
+        print(f"Пополнено: {amount}. Баланс: {self._balance}")
+
+    def withdraw(self, amount):
+        if amount &lt;= 0:
+            print("Сумма должна быть больше нуля")
+            return False
+        if amount > self._balance:
+            print(f"Недостаточно средств. Баланс: {self._balance}")
+            return False
+        self._balance -= amount
+        print(f"Снято: {amount}. Баланс: {self._balance}")
+        return True
+
+    def transfer_to(self, target, amount):
+        if not isinstance(target, BankAccount) or target is self:
+            print("Некорректный получатель")
+            return False
+        if self.withdraw(amount):
+            target._balance += amount
+            return True
+        return False
+
+    @staticmethod
+    def is_valid_pin(pin):
+        return isinstance(pin, int) and 1000 &lt;= pin &lt;= 9999
+
+    # ===== Представление =====
+    def __str__(self):
+        return f"{self._number} | {self._owner} | {self._balance} сом"
+
+    def __repr__(self):
+        return f"BankAccount(owner={self._owner!r}, balance={self._balance!r})"
+
+
+if __name__ == "__main__":
+    aziz = BankAccount("Азиз", 1234, 5000)
+    aigerim = BankAccount.from_string("Айгерим;4321;0")
+
+    print(aziz)
+    print(aigerim)
+
+    aziz.deposit(1500)
+    aziz.withdraw(10000)
+    aziz.transfer_to(aigerim, 2000)
+
+    print(aziz)
+    print(aigerim)
+    print("PIN верный?", aziz.check_pin(1234))
+    print("PIN 12 валиден?", BankAccount.is_valid_pin(12))
+
+    try:
+        aziz.balance = 1_000_000
+    except AttributeError as e:
+        print("Ошибка:", e)</code></pre></div>
+<div class="out">KG-1001 | Азиз | 5000 сом
+KG-1002 | Айгерим | 0.0 сом
+Пополнено: 1500. Баланс: 6500
+Недостаточно средств. Баланс: 6500
+Снято: 2000. Баланс: 4500
+KG-1001 | Азиз | 4500 сом
+KG-1002 | Айгерим | 2000.0 сом
+PIN верный? True
+PIN 12 валиден? False
+Ошибка: property 'balance' of 'BankAccount' object has no setter</div>
+  <div class="note"><b>Что здесь важно</b><code>aziz.balance = ...</code> не работает: у свойства нет сеттера. Баланс меняется только через <code>deposit</code>, <code>withdraw</code>, <code>transfer_to</code>, и каждый метод проверяет данные. Строка <code>if __name__ == "__main__":</code> означает, что код ниже выполнится только при прямом запуске файла, но не при импорте.</div>
+  <div class="warn"><b>Для реальных денег</b><code>float</code> здесь для простоты. В финансовых расчётах используют <code>decimal.Decimal</code> или целые тыйыны (<code>int</code>): <code>0.1 + 0.2</code> в Python даёт <code>0.30000000000000004</code>.</div>
+  <p>Текст ошибки в последней строке зависит от версии: выше — вывод Python 3.13. В старых версиях будет <code>can't set attribute</code>.</p>
+</section>
+
+<!-- 15 -->
+<section id="s15">
+  <h2><span class="num">15</span>Частые ошибки новичков</h2>
+  <ul class="check bad">
+    <li><b>Забыли <code>self</code> в параметрах метода</b> → <code>TypeError: ... takes 0 positional arguments but 1 was given</code>.</li>
+    <li><b>Забыли <code>self.</code> при обращении к атрибуту</b>: <code>name = name</code> вместо <code>self.name = name</code>.</li>
+    <li><b>Опечатка в <code>__init__</code></b>: <code>__int__</code> или <code>_init_</code> — инициализатор просто не вызовется.</li>
+    <li><b>Изменяемый default</b>: <code>def __init__(self, items=[])</code> — список общий для всех объектов.</li>
+    <li><b>Изменяемый атрибут класса</b>: <code>students = []</code> в теле класса — тоже общий для всех объектов. Списки создавайте в <code>__init__</code>.</li>
+    <li><b><code>self.count += 1</code> вместо <code>ClassName.count += 1</code></b> — создаётся атрибут объекта, счётчик класса не меняется.</li>
+    <li><b>Наследник с <code>__init__</code> без <code>super().__init__()</code></b> — атрибуты родителя не созданы.</li>
+    <li><b><code>__eq__</code> без <code>__hash__</code></b> — объект нельзя положить в <code>set</code>/<code>dict</code>.</li>
+    <li><b>Сравнение с None через <code>==</code></b> вместо <code>is None</code>.</li>
+    <li><b>Java-стиль</b>: <code>get_x()</code>/<code>set_x()</code> для каждого атрибута. В Python — обычный атрибут или <code>@property</code>.</li>
+  </ul>
+</section>
+
+<!-- 16 -->
+<section id="s16">
+  <h2><span class="num">16</span>Python vs Java: классы</h2>
+  <table>
+    <tr><th>Что</th><th>Java</th><th>Python</th></tr>
+    <tr><td>Создание объекта</td><td><code>new Student("A", 1)</code></td><td><code>Student("A", 1)</code></td></tr>
+    <tr><td>Конструктор</td><td><code>Student(...) { }</code></td><td><code>def __init__(self, ...):</code></td></tr>
+    <tr><td>Текущий объект</td><td><code>this</code> (неявный)</td><td><code>self</code> (явный параметр)</td></tr>
+    <tr><td>Объявление полей</td><td>Заранее, с типом</td><td>В <code>__init__</code> через <code>self.x = ...</code></td></tr>
+    <tr><td>Доступ</td><td><code>private</code>/<code>protected</code>/<code>public</code></td><td>Соглашения: <code>_x</code>, <code>__x</code></td></tr>
+    <tr><td>Геттеры/сеттеры</td><td><code>getX()</code>/<code>setX()</code></td><td><code>@property</code></td></tr>
+    <tr><td>Перегрузка</td><td>Есть</td><td>Нет — значения по умолчанию, <code>@classmethod</code></td></tr>
+    <tr><td>Член класса</td><td><code>static</code></td><td>Атрибут в теле класса, <code>@classmethod</code>, <code>@staticmethod</code></td></tr>
+    <tr><td>Константа</td><td><code>static final</code></td><td>Имя КАПСОМ (только соглашение)</td></tr>
+    <tr><td>Строковое представление</td><td><code>toString()</code></td><td><code>__str__</code>, <code>__repr__</code></td></tr>
+    <tr><td>Равенство по значению</td><td><code>equals()</code> + <code>hashCode()</code></td><td><code>__eq__</code> + <code>__hash__</code></td></tr>
+    <tr><td>Тот же объект</td><td><code>==</code></td><td><code>is</code></td></tr>
+    <tr><td>Пустая ссылка</td><td><code>null</code></td><td><code>None</code></td></tr>
+    <tr><td>Наследование</td><td><code>extends</code>, один родитель</td><td><code>class B(A)</code>, можно несколько</td></tr>
+    <tr><td>Вызов родителя</td><td><code>super(...)</code>, <code>super.m()</code></td><td><code>super().__init__(...)</code>, <code>super().m()</code></td></tr>
+    <tr><td>Класс-данные</td><td><code>record</code></td><td><code>@dataclass</code></td></tr>
+    <tr><td>Проверка типов</td><td>При компиляции</td><td>Во время выполнения (аннотации не проверяются)</td></tr>
+  </table>
+</section>
+
+<!-- 17 -->
+<section id="s17">
+  <h2><span class="num">17</span>Шпаргалка и задание</h2>
+  <table>
+    <tr><th>Понятие</th><th>Коротко</th></tr>
+    <tr><td><code>class X:</code></td><td>Объявление класса</td></tr>
+    <tr><td><code>X(...)</code></td><td>Создание объекта</td></tr>
+    <tr><td><code>__init__</code></td><td>Инициализация атрибутов</td></tr>
+    <tr><td><code>self</code></td><td>Текущий объект, первый параметр метода</td></tr>
+    <tr><td>Атрибут в теле класса</td><td>Общий для всех объектов</td></tr>
+    <tr><td><code>_x</code> / <code>__x</code></td><td>Внутренний / «приватный» с name mangling</td></tr>
+    <tr><td><code>@property</code></td><td>Метод, который выглядит как атрибут</td></tr>
+    <tr><td><code>@classmethod</code></td><td>Получает <code>cls</code>; альтернативные конструкторы</td></tr>
+    <tr><td><code>@staticmethod</code></td><td>Без <code>self</code> и <code>cls</code></td></tr>
+    <tr><td><code>__str__</code> / <code>__repr__</code></td><td>Текст для пользователя / для отладки</td></tr>
+    <tr><td><code>is</code> vs <code>==</code></td><td>Тот же объект vs равное значение</td></tr>
+    <tr><td><code>@dataclass</code></td><td>Автогенерация <code>__init__</code>, <code>__repr__</code>, <code>__eq__</code></td></tr>
+  </table>
+
+  <h3>Проверь себя</h3>
+  <details><summary>1. Зачем self в параметрах метода?</summary>Через него метод получает объект, у которого вызван. <code>obj.m()</code> превращается в <code>Cls.m(obj)</code>, и <code>obj</code> попадает в <code>self</code>.</details>
+  <details><summary>2. Что выведет код: <code>a = Student("A", 1); b = a; b.age = 5; print(a.age)</code></summary><code>5</code>. <code>a</code> и <code>b</code> — два имени одного объекта.</details>
+  <details><summary>3. Можно ли написать два __init__ с разным числом параметров?</summary>Нет. Второе определение заменит первое. Используют значения по умолчанию или <code>@classmethod</code>.</details>
+  <details><summary>4. Чем атрибут класса отличается от атрибута объекта?</summary>Атрибут класса один на всех (объявлен в теле класса). Атрибут объекта у каждого свой (создаётся через <code>self.x = ...</code>).</details>
+  <details><summary>5. Что делает __balance (два подчёркивания)?</summary>Python переименовывает его в <code>_ИмяКласса__balance</code>. Снаружи по имени <code>__balance</code> не достать, но полной защиты нет.</details>
+  <details><summary>6. Почему объект с __eq__ вдруг нельзя положить в set?</summary>Определение <code>__eq__</code> без <code>__hash__</code> делает <code>__hash__ = None</code>, и объект становится нехешируемым. Нужно определить <code>__hash__</code> тоже.</details>
+  <details><summary>7. Что не так: <code>def __init__(self, items=[]):</code></summary>Список по умолчанию создаётся один раз и будет общим для всех объектов. Правильно: <code>items=None</code>, а в теле — <code>self.items = items if items is not None else []</code>.</details>
+
+  <h3>Практическое задание</h3>
+  <div class="tip"><b>Класс <code>Book</code> для библиотеки</b>
+    <ol>
+      <li>Атрибуты: <code>title</code>, <code>author</code>, <code>year</code>, <code>_is_available</code>, <code>id</code>.</li>
+      <li>Атрибут класса-счётчик для автоматической генерации <code>id</code>.</li>
+      <li><code>year</code> со значением по умолчанию 0 и <code>@property</code>-сеттером с проверкой (от 0 до текущего года).</li>
+      <li><code>@property is_available</code> — только для чтения.</li>
+      <li>Методы <code>borrow()</code> и <code>return_book()</code>: нельзя взять уже выданную и вернуть невыданную книгу.</li>
+      <li><code>@classmethod from_string("Название;Автор;Год")</code>.</li>
+      <li><code>__str__</code>, <code>__repr__</code>, <code>__eq__</code> и <code>__hash__</code> по <code>title</code> + <code>author</code>.</li>
+      <li>Бонус: перепишите класс через <code>@dataclass</code> и сравните, сколько кода ушло.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  IT &amp; Старт в разработке · Следующая тема: наследование, полиморфизм и абстрактные классы
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var KW = new Set(("class def return if elif else for while in not and or is None True False import from as " +
+    "pass raise try except finally with lambda yield global nonlocal del assert break continue async await").split(" "));
+  var BI = new Set("print len range isinstance issubclass super int float str list dict set tuple type id hash sorted object property classmethod staticmethod field dataclass NotImplemented ValueError TypeError AttributeError".split(" "));
+  var esc = function(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");};
+  var re = /(#[^\n]*)|([rbfRBF]{0,2}(?:"""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'))|(@[\w.]+)|(\b\d[\d_]*(?:\.\d+)?\b)|(\b[A-Za-z_]\w*\b)/g;
+  document.querySelectorAll("pre code").forEach(function(el){
+    var src = el.textContent, out = "", last = 0, m;
+    re.lastIndex = 0;
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      var t = m[0], c = null;
+      if (m[1]) c = "c"; else if (m[2]) c = "s"; else if (m[3]) c = "a"; else if (m[4]) c = "n";
+      else if (m[5]) {
+        if (t === "self" || t === "cls") c = "v";
+        else if (KW.has(t)) c = "k";
+        else if (BI.has(t)) c = "b";
+        else if (/^__\w+__$/.test(t)) c = "a";
+        else if (/^[A-Z]/.test(t)) c = "t";
+      }
+      out += c ? '<span class="' + c + '">' + esc(t) + "</span>" : esc(t);
+      last = re.lastIndex;
+    }
+    out += esc(src.slice(last));
+    el.innerHTML = out;
+  });
+  document.querySelectorAll(".codebox").forEach(function(box){
+    var b = document.createElement("button");
+    b.textContent = "Копировать";
+    b.onclick = function(){
+      var txt = box.querySelector("code").textContent;
+      var done = function(){ b.textContent = "Скопировано"; setTimeout(function(){ b.textContent = "Копировать"; }, 1500); };
+      function fallback(){
+        var ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta);
+        ta.select(); try { document.execCommand("copy"); done(); } catch(e) {} document.body.removeChild(ta);
+      }
+      try { if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, fallback); else fallback(); } catch(e) { fallback(); }
+    };
+    box.appendChild(b);
+  });
+})();
+</script>
+</body>
+</html>
